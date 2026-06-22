@@ -1,0 +1,9 @@
+# BPF compiled objects and skeletons
+obj/
+*.bpf.o
+*.skel.h
+Benchmark output 
+# Editor
+.vscode/
+*.swp
+*~
