@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // src/firewall_b1.bpf.c — Config B1: tail-call chain structure
+// SAFETY: Rule 0 always ACCEPTs SSH from bastion (10.8.50.180)
+
 #include <linux/bpf.h>
 #include <linux/pkt_cls.h>
 #include <linux/if_ether.h>
@@ -9,6 +11,8 @@
 #include <linux/in.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
+
+#define BASTION_IP 0x0A0832B4U  // 10.8.50.180
 
 struct {
     __uint(type,        BPF_MAP_TYPE_PROG_ARRAY);
@@ -44,13 +48,26 @@ static __always_inline struct iphdr *parse_ip(struct __sk_buff *skb) {
 SEC("tc") int chain_input(struct __sk_buff *skb) {
     struct iphdr *ip = parse_ip(skb); if (!ip) goto accept;
     __u32 src = bpf_ntohl(ip->saddr);
-    if ((src & 0xFFFFFF00U) == 0xC0A86400U) { count(1,3,skb->len); return TC_ACT_SHOT; }
-    if (ip->protocol == IPPROTO_TCP) {
-        void *data_end = (void *)(long)skb->data_end;
+    void *data_end = (void *)(long)skb->data_end;
+
+    // Rule 0 — SAFETY: always ACCEPT SSH from bastion
+    if (src == BASTION_IP && ip->protocol == IPPROTO_TCP) {
         struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(tcp+1) <= data_end && bpf_ntohs(tcp->dest)==22 && (src&0xFF000000U)==0x0A000000U)
+        if ((void *)(tcp + 1) <= data_end && bpf_ntohs(tcp->dest) == 22)
+            goto accept;
+    }
+
+    // Rule 1 — DROP src 192.168.100.0/24
+    if ((src & 0xFFFFFF00U) == 0xC0A86400U) { count(1,3,skb->len); return TC_ACT_SHOT; }
+
+    // Rule 2 — DROP tcp:22 from 10.0.0.0/8
+    if (ip->protocol == IPPROTO_TCP) {
+        struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
+        if ((void *)(tcp+1) <= data_end && bpf_ntohs(tcp->dest)==22 &&
+            (src & 0xFF000000U) == 0x0A000000U)
             { count(1,3,skb->len); return TC_ACT_SHOT; }
     }
+
     bpf_tail_call(skb, &chain_jump_table, 1);
 accept:
     count(0,2,skb->len); return TC_ACT_OK;
@@ -59,6 +76,7 @@ accept:
 SEC("tc") int chain_forward(struct __sk_buff *skb) {
     struct iphdr *ip = parse_ip(skb); if (!ip) goto accept;
     void *data_end = (void *)(long)skb->data_end;
+
     if (ip->protocol == IPPROTO_TCP) {
         struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
         if ((void *)(tcp+1) <= data_end) {
@@ -72,6 +90,7 @@ SEC("tc") int chain_forward(struct __sk_buff *skb) {
             { count(0,2,skb->len); return TC_ACT_OK; }
     }
     if (ip->protocol == IPPROTO_ICMP) { count(0,2,skb->len); return TC_ACT_OK; }
+
     bpf_tail_call(skb, &chain_jump_table, 2);
 accept:
     count(0,2,skb->len); return TC_ACT_OK;
@@ -80,4 +99,5 @@ accept:
 SEC("tc") int chain_custom(struct __sk_buff *skb) {
     count(1,3,skb->len); return TC_ACT_SHOT;
 }
+
 char _license[] SEC("license") = "GPL";
