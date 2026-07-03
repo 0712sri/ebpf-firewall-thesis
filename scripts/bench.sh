@@ -80,8 +80,8 @@ CPU_A=$(grep '^cpu ' /proc/stat | awk '{t=0; for(i=2;i<=NF;i++) t+=$i; print t, 
 
 # ── Parse results ─────────────────────────────────────────────────────────────
 RESULT=$(sudo cat /proc/net/pktgen/"$IFACE")
-PPS=$(echo "$RESULT"  | grep -oP '\d+ pps' | grep -oP '\d+')
-MBPS=$(echo "$RESULT" | grep -oP '\d+Mb/sec' | grep -oP '\d+')
+PPS=$(echo "$RESULT"  | grep -oP '\d+(?=pps)')
+MBPS=$(echo "$RESULT" | grep -oP '\d+(?=Mb/sec)')
 
 CPU=$(python3 -c "
 b='${CPU_B}'.split(); a='${CPU_A}'.split()
