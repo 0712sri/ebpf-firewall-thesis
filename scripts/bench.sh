@@ -1,26 +1,110 @@
 #!/usr/bin/env bash
+# scripts/bench.sh
+# Controlled pktgen benchmark for one config.
+#
+# Usage:
+#   sudo bash scripts/bench.sh <config> <pkt_size> <duration_sec>
+#
+# Examples:
+#   sudo bash scripts/bench.sh bare    64  30
+#   sudo bash scripts/bench.sh b2     64  30
+#   sudo bash scripts/bench.sh b1     64  30
+#   sudo bash scripts/bench.sh config_a 64  30
+#
+# Output: bench/results.csv (appended)
+
 set -euo pipefail
-CONFIG=${1:-b2}; IFACE=${2:-ens3}; TARGET=${3:-10.8.50.178}; DUR=${4:-30}
+
+CONFIG=${1:-bare}
+PKT_SIZE=${2:-64}
+DURATION=${3:-30}
+IFACE=eth0
+DST_IP=10.8.50.178
+DST_MAC=bc:24:11:27:71:9a
+RESULTS=bench/results.csv
+THREAD=kpktgend_0
+
 mkdir -p bench
-TS=$(date +%Y%m%d_%H%M%S)
-OUT="bench/results_${CONFIG}_${TS}.csv"
+
+# ── Write CSV header if file is new ──────────────────────────────────────────
+if [[ ! -f "$RESULTS" ]]; then
+    echo "timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct" > "$RESULTS"
+fi
+
+# ── Attach firewall if needed ─────────────────────────────────────────────────
+echo "[bench] Config=$CONFIG  PktSize=${PKT_SIZE}B  Duration=${DURATION}s"
+
 case "$CONFIG" in
-  counter) sudo bash scripts/tc_attach.sh attach "$IFACE" obj/pkt_counter.bpf.o tc ;;
-  b1)      sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b1.bpf.o tc ;;
-  b2)      sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b2.bpf.o tc ;;
-  none)    sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true ;;
+    bare)
+        sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
+        ;;
+    b1)
+        sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b1.bpf.o tc
+        ;;
+    b2)
+        sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b2.bpf.o tc
+        ;;
+    config_a)
+        # Config A uses iptables — set up separately
+        echo "[bench] Config A: ensure iptables rules are loaded before running"
+        ;;
+    *)
+        echo "Unknown config: $CONFIG"; exit 1
+        ;;
 esac
-sleep 1
-echo "timestamp,config,pps,cpu_pct" > "$OUT"
-CPU_B=$(grep '^cpu ' /proc/stat | awk '{t=0;for(i=2;i<=NF;i++)t+=$i; print t,$5}')
-sleep "$DUR"
-CPU_A=$(grep '^cpu ' /proc/stat | awk '{t=0;for(i=2;i<=NF;i++)t+=$i; print t,$5}')
+
+sleep 1  # let program settle
+
+# ── Set up pktgen ─────────────────────────────────────────────────────────────
+sudo bash -c "
+echo 'rem_device_all' > /proc/net/pktgen/$THREAD
+echo 'add_device $IFACE' > /proc/net/pktgen/$THREAD
+echo 'count 0'          > /proc/net/pktgen/$IFACE
+echo 'delay 0'          > /proc/net/pktgen/$IFACE
+echo 'pkt_size $PKT_SIZE' > /proc/net/pktgen/$IFACE
+echo 'dst $DST_IP'      > /proc/net/pktgen/$IFACE
+echo 'dst_mac $DST_MAC' > /proc/net/pktgen/$IFACE
+"
+
+# ── CPU baseline ──────────────────────────────────────────────────────────────
+CPU_B=$(grep '^cpu ' /proc/stat | awk '{t=0; for(i=2;i<=NF;i++) t+=$i; print t, $5}')
+
+# ── Run ───────────────────────────────────────────────────────────────────────
+echo "[bench] Running..."
+sudo bash -c "echo 'start' > /proc/net/pktgen/pgctrl" &
+sleep "$DURATION"
+sudo bash -c "echo 'stop' > /proc/net/pktgen/pgctrl"
+
+# ── CPU after ─────────────────────────────────────────────────────────────────
+CPU_A=$(grep '^cpu ' /proc/stat | awk '{t=0; for(i=2;i<=NF;i++) t+=$i; print t, $5}')
+
+# ── Parse results ─────────────────────────────────────────────────────────────
+RESULT=$(sudo cat /proc/net/pktgen/"$IFACE")
+PPS=$(echo "$RESULT"  | grep -oP '\d+ pps' | grep -oP '\d+')
+MBPS=$(echo "$RESULT" | grep -oP '\d+Mb/sec' | grep -oP '\d+')
+
 CPU=$(python3 -c "
 b='${CPU_B}'.split(); a='${CPU_A}'.split()
 dt=int(a[0])-int(b[0]); di=int(a[1])-int(b[1])
 print(f'{(1-di/dt)*100:.1f}' if dt else '0')
 ")
-echo "$TS,$CONFIG,0,$CPU" >> "$OUT"
-echo "=== $CONFIG | CPU: ${CPU}% | $OUT ==="
-sudo bash scripts/read_stats.sh 2>/dev/null || true
-sudo bash scripts/tc_attach.sh detach "$IFACE"
+
+TS=$(date +%Y%m%d_%H%M%S)
+echo "$TS,$CONFIG,$PKT_SIZE,$DURATION,${PPS:-0},${MBPS:-0},$CPU" >> "$RESULTS"
+
+# ── Print summary ─────────────────────────────────────────────────────────────
+echo ""
+echo "════════════════════════════════════"
+echo "  Config   : $CONFIG"
+echo "  Pkt size : ${PKT_SIZE}B"
+echo "  PPS      : ${PPS:-0}"
+echo "  Mbps     : ${MBPS:-0}"
+echo "  CPU      : ${CPU}%"
+echo "  Results  : $RESULTS"
+echo "════════════════════════════════════"
+
+# ── Show firewall stats if loaded ────────────────────────────────────────────
+sudo bash scripts/read_stats.sh fw_stats 2>/dev/null || true
+
+# ── Detach firewall ───────────────────────────────────────────────────────────
+sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
