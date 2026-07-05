@@ -13,8 +13,8 @@ SKELS := $(patsubst src/%.bpf.c, obj/%.skel.h, $(SRCS))
 
 .PHONY: all skels clean
 
-all: $(OBJS)
-	@echo "\n✓ Built:"; ls -lh obj/*.bpf.o
+all: $(OBJS) obj/b1_loader
+	@echo "\n✓ Built:"; ls -lh obj/
 
 skels: $(SKELS)
 
@@ -23,6 +23,10 @@ obj/%.bpf.o: src/%.bpf.c | obj
 
 obj/%.skel.h: obj/%.bpf.o
 	$(BPFTOOL) gen skeleton $< > $@
+
+obj/b1_loader: src/b1_loader.c | obj
+	gcc -O2 -Wall -o $@ $< -lbpf -lelf -lz
+	@echo "  built $@"
 
 obj:
 	mkdir -p obj
