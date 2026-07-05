@@ -38,9 +38,11 @@ case "$CONFIG" in
     bare)
         sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
         ;;
-    b1)
-        sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b1.bpf.o tc
-        ;;
+   b1)
+    sudo ./obj/b1_loader "$IFACE" &
+    B1_PID=$!
+    sleep 2  # wait for loader to attach
+    ;;
     b2)
         sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b2.bpf.o tc
         ;;
@@ -107,4 +109,10 @@ echo "════════════════════════�
 sudo bash scripts/read_stats.sh fw_stats 2>/dev/null || true
 
 # ── Detach firewall ───────────────────────────────────────────────────────────
-sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
+# Detach — kill b1_loader if running, otherwise use tc detach
+if [[ -n "${B1_PID:-}" ]]; then
+    sudo kill "$B1_PID" 2>/dev/null || true
+    wait "$B1_PID" 2>/dev/null || true
+else
+    sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
+fi
