@@ -18,9 +18,9 @@ set -euo pipefail
 CONFIG=${1:-bare}
 PKT_SIZE=${2:-64}
 DURATION=${3:-30}
-IFACE=eth0
-DST_IP=10.8.50.178
-DST_MAC=bc:24:11:27:71:9a
+IFACE=eth1
+DST_IP=10.35.5.2
+DST_MAC=bc:24:11:f8:86:f9
 RESULTS=bench/results.csv
 THREAD=kpktgend_0
 
@@ -47,9 +47,8 @@ case "$CONFIG" in
         sudo bash scripts/tc_attach.sh attach "$IFACE" obj/firewall_b2.bpf.o tc
         ;;
     config_a)
-        # Config A uses iptables — set up separately
-        echo "[bench] Config A: ensure iptables rules are loaded before running"
-        ;;
+    sudo bash scripts/config_a_setup.sh load
+    ;;
     *)
         echo "Unknown config: $CONFIG"; exit 1
         ;;
@@ -116,3 +115,4 @@ if [[ -n "${B1_PID:-}" ]]; then
 else
     sudo bash scripts/tc_attach.sh detach "$IFACE" 2>/dev/null || true
 fi
+sudo bash scripts/config_a_setup.sh flush 2>/dev/null || true
