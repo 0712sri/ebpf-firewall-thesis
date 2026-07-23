@@ -59,8 +59,8 @@ int firewall_compressed(struct __sk_buff *skb)
         if ((void *)(tcp + 1) > data_end) goto accept;
         __u16 dport = bpf_ntohs(tcp->dest);
         if (dport == 22 && (src & 0xFF000000U) == 0x0A000000U) goto drop;
-        if (dport == 80 || dport == 443) goto accept;
-        goto drop;
+        if (dport == 80 || dport == 443 || dport == 5201) goto accept;
+            goto drop;
     }
 
     // Rule 5 — ACCEPT udp:53
