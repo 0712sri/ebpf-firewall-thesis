@@ -1,68 +1,41 @@
 #!/usr/bin/env bash
 # scripts/config_a_setup.sh
-# Config A — iptables baseline ruleset
-# Same logical rules as B1/B2 but using netfilter.
-#
-# Usage:
-#   sudo bash scripts/config_a_setup.sh load    # apply rules
-#   sudo bash scripts/config_a_setup.sh flush   # remove all rules
+# Config A — iptables FORWARD rules on xdp-firewall
+# Traffic flows: xdp-sender (192.168.1.2) → xdp-firewall → xdp-receiver (192.168.2.2)
+# Rules filter FORWARDED traffic — not INPUT to the firewall itself
 
 set -euo pipefail
-
 ACTION=${1:-load}
-IFACE=eth1
 
 case "$ACTION" in
     load)
-        # Flush existing rules first
-        iptables -F
-        iptables -X
-
-        # Default policy — DROP everything not explicitly allowed
-        iptables -P INPUT DROP
+        iptables -F FORWARD
         iptables -P FORWARD DROP
-        iptables -P OUTPUT ACCEPT
 
-        # Rule 0 — SAFETY: always accept SSH from bastion (10.8.50.180)
-        iptables -A INPUT -i eth0 -p tcp --dport 22 -s 10.8.50.180 -j ACCEPT
+        # Allow established/related return traffic (conntrack)
+        iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-        # Rule 0b — accept established connections (needed for SSH to stay up)
-        iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+        # Allow HTTP to receiver
+        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 80 -j ACCEPT
 
-        # Rule 1 — DROP src 192.168.100.0/24
-        iptables -A INPUT -i $IFACE -s 192.168.100.0/24 -j DROP
+        # Allow HTTPS to receiver
+        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 443 -j ACCEPT
 
-        # Rule 2 — DROP tcp:22 from 10.0.0.0/8
-        iptables -A INPUT -i $IFACE -p tcp --dport 22 -s 10.0.0.0/8 -j DROP
+        # Allow iperf3 to receiver
+        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 5201 -j ACCEPT
 
-        # Rule 3 — ACCEPT tcp:80
-        iptables -A INPUT -i $IFACE -p tcp --dport 80 -j ACCEPT
+        # Allow ICMP (ping) through
+        iptables -A FORWARD -p icmp -j ACCEPT
 
-        # Rule 4 — ACCEPT tcp:443
-        iptables -A INPUT -i $IFACE -p tcp --dport 443 -j ACCEPT
-
-        # Rule 5 — ACCEPT udp:53
-        iptables -A INPUT -i $IFACE -p udp --dport 53 -j ACCEPT
-
-        # Rule 6 — ACCEPT ICMP
-        iptables -A INPUT -i $IFACE -p icmp -j ACCEPT
-
-        # Rule 7 — DROP default (already set by policy)
-
-        echo "✓ Config A loaded on $IFACE"
-        echo ""
-        iptables -L INPUT -v -n --line-numbers
+        # Default DROP (already set by policy)
+        echo "✓ Config A loaded on xdp-firewall FORWARD chain"
+        iptables -L FORWARD -v -n --line-numbers
         ;;
-
     flush)
-        iptables -F
-        iptables -X
-        iptables -P INPUT ACCEPT
+        iptables -F FORWARD
         iptables -P FORWARD ACCEPT
-        iptables -P OUTPUT ACCEPT
-        echo "✓ iptables flushed — all traffic allowed"
+        echo "✓ iptables FORWARD flushed — all traffic allowed"
         ;;
-
     *)
         echo "Usage: $0 [load|flush]"
         exit 1
