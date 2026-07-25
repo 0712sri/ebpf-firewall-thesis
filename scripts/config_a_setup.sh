@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# scripts/config_a_setup.sh
-# Config A — iptables FORWARD rules on xdp-firewall
-# Traffic flows: xdp-sender (192.168.1.2) → xdp-firewall → xdp-receiver (192.168.2.2)
-# Rules filter FORWARDED traffic — not INPUT to the firewall itself
+# Config A — stateless iptables FORWARD rules on xdp-firewall
+# Bidirectional rules — no conntrack — matches B1/B2 scope
 
 set -euo pipefail
 ACTION=${1:-load}
@@ -12,29 +10,32 @@ case "$ACTION" in
         iptables -F FORWARD
         iptables -P FORWARD DROP
 
-        # Allow established/related return traffic (conntrack)
-        iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+        # TCP port 80 — both directions (stateless)
+        iptables -A FORWARD -p tcp --dport 80 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 80 -j ACCEPT
 
-        # Allow HTTP to receiver
-        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 80 -j ACCEPT
+        # TCP port 443 — both directions
+        iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
 
-        # Allow HTTPS to receiver
-        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 443 -j ACCEPT
+        # TCP port 5201 (iperf3) — both directions
+        iptables -A FORWARD -p tcp --dport 5201 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 5201 -j ACCEPT
 
-        # Allow iperf3 to receiver
-        iptables -A FORWARD -p tcp -d 192.168.2.2 --dport 5201 -j ACCEPT
-
-        # Allow ICMP (ping) through
+        # ICMP both directions
         iptables -A FORWARD -p icmp -j ACCEPT
 
-        # Default DROP (already set by policy)
-        echo "✓ Config A loaded on xdp-firewall FORWARD chain"
+        # UDP port 53 (DNS) — both directions
+        iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+        iptables -A FORWARD -p udp --sport 53 -j ACCEPT
+
+        echo "✓ Config A (stateless) loaded on xdp-firewall FORWARD chain"
         iptables -L FORWARD -v -n --line-numbers
         ;;
     flush)
         iptables -F FORWARD
         iptables -P FORWARD ACCEPT
-        echo "✓ iptables FORWARD flushed — all traffic allowed"
+        echo "✓ iptables FORWARD flushed"
         ;;
     *)
         echo "Usage: $0 [load|flush]"
