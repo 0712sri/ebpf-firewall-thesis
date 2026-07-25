@@ -24,3 +24,7 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260713_perf_bare,bare,64,30,51427,26,119
 20260713_perf_b1,b1,64,30,50969,26,111
 20260713_perf_b2,b2,64,30,51427,26,126
+20260725_latency_bare,bare,ping,100,1.720,1.195,11.744,1.021
+20260725_latency_config_a,config_a,ping,100,1.681,1.278,2.217,0.115
+20260725_latency_b2,b2,ping,100,1.620,1.283,2.643,0.144
+20260725_latency_b1,b1,ping,100,1.638,1.078,2.454,0.162
