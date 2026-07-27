@@ -28,3 +28,7 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260725_latency_config_a,config_a,ping,100,1.681,1.278,2.217,0.115
 20260725_latency_b2,b2,ping,100,1.620,1.283,2.643,0.144
 20260725_latency_b1,b1,ping,100,1.638,1.078,2.454,0.162
+20260727_bare_udp10,bare,iperf3-tcp,30,2.21,0.15
+20260727_config_a_10,config_a_stateless,iperf3-tcp,30,2.47,0.14
+20260727_b2_10,b2,iperf3-tcp,30,2.50,0.13
+20260727_b1_10,b1,iperf3-tcp,30,2.13,0.05
