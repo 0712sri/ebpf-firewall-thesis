@@ -36,3 +36,6 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260727_lat_config_a,config_a_stateless,ping,100,1.664,1.379,2.283,0.117
 20260727_lat_b2,b2,ping,100,1.685,1.027,2.153,0.138
 20260727_lat_b1,b1,ping,100,1.632,1.311,2.085,0.117
+20260727_mixed_config_a,config_a_stateless,mixed,30,2.37,5.354,0.889
+20260727_mixed_b2,b2,mixed,30,2.31,5.791,1.158
+20260727_mixed_b1,b1,mixed,30,2.12,5.928,1.874
