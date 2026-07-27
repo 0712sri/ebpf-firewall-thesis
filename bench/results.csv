@@ -32,3 +32,7 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260727_config_a_10,config_a_stateless,iperf3-tcp,30,2.47,0.14
 20260727_b2_10,b2,iperf3-tcp,30,2.50,0.13
 20260727_b1_10,b1,iperf3-tcp,30,2.13,0.05
+20260727_lat_bare,bare,ping,100,1.686,1.325,2.493,0.143
+20260727_lat_config_a,config_a_stateless,ping,100,1.664,1.379,2.283,0.117
+20260727_lat_b2,b2,ping,100,1.685,1.027,2.153,0.138
+20260727_lat_b1,b1,ping,100,1.632,1.311,2.085,0.117
