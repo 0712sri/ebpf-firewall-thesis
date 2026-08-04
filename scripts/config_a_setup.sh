@@ -29,6 +29,10 @@ case "$ACTION" in
         iptables -A FORWARD -p udp --dport 53 -j ACCEPT
         iptables -A FORWARD -p udp --sport 53 -j ACCEPT
 
+        # UDP port 5001 (pktgen test traffic) — both directions
+        iptables -A FORWARD -p udp --dport 5001 -j ACCEPT
+        iptables -A FORWARD -p udp --sport 5001 -j ACCEPT
+
         echo "✓ Config A (stateless) loaded on xdp-firewall FORWARD chain"
         iptables -L FORWARD -v -n --line-numbers
         ;;
