@@ -39,3 +39,12 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260727_mixed_config_a,config_a_stateless,mixed,30,2.37,5.354,0.889
 20260727_mixed_b2,b2,mixed,30,2.31,5.791,1.158
 20260727_mixed_b1,b1,mixed,30,2.12,5.928,1.874
+20260728_sat_b2_10k,b2,pktgen-udp,10,10000,0
+20260728_sat_b2_50k,b2,pktgen-udp,10,32010,0
+20260728_sat_b2_100k,b2,pktgen-udp,10,31230,0
+20260728_sat_b1_10k,b1,pktgen-udp,10,10000,0
+20260728_sat_b1_50k,b1,pktgen-udp,10,32335,0
+20260728_sat_b1_100k,b1,pktgen-udp,10,32488,0
+20260728_sat_a_10k,config_a,pktgen-udp,10,10000,0
+20260728_sat_a_50k,config_a,pktgen-udp,10,31827,0
+20260728_sat_a_100k,config_a,pktgen-udp,10,33027,0
