@@ -82,7 +82,7 @@ SEC("tc") int chain_forward(struct __sk_buff *skb) {
         struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
         if ((void *)(tcp+1) <= data_end) {
             __u16 d = bpf_ntohs(tcp->dest);
-            if (d==80||d==443||d==5201) { count(0,2,skb->len); return TC_ACT_OK; }
+            if (d==80||d==443||d==5201||d==5001) { count(0,2,skb->len); return TC_ACT_OK; }
         }
     }
 
