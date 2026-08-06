@@ -48,3 +48,7 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260728_sat_a_10k,config_a,pktgen-udp,10,10000,0
 20260728_sat_a_50k,config_a,pktgen-udp,10,31827,0
 20260728_sat_a_100k,config_a,pktgen-udp,10,33027,0
+20260728_cpu_bare,bare,mpstat,30,2.25,8.30,91.60
+20260728_cpu_config_a,config_a,mpstat,30,2.32,22.35,77.53
+20260728_cpu_b2,b2,mpstat,30,2.23,21.89,77.97
+20260728_cpu_b1,b1,mpstat,30,2.06,23.44,76.41
