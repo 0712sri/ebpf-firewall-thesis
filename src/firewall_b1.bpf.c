@@ -77,16 +77,18 @@ SEC("tc") int chain_forward(struct __sk_buff *skb) {
     struct iphdr *ip = parse_ip(skb); if (!ip) goto accept;
     void *data_end = (void *)(long)skb->data_end;
 
-    // Rule 3,4,5 — ACCEPT tcp:80, tcp:443, tcp:5201
+    // Rule 3,4,5 — ACCEPT tcp:80, tcp:443, tcp:5201 both directions
     if (ip->protocol == IPPROTO_TCP) {
         struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
         if ((void *)(tcp+1) <= data_end) {
             __u16 d = bpf_ntohs(tcp->dest);
-            if (d==80||d==443||d==5201) { count(0,2,skb->len); return TC_ACT_OK; }
+            __u16 s = bpf_ntohs(tcp->source);
+            if (d==80||d==443||d==5201||s==80||s==443||s==5201)
+                { count(0,2,skb->len); return TC_ACT_OK; }
         }
     }
 
-    // Rule 6 — ACCEPT udp:53
+    // Rule 6 — ACCEPT udp:53 and udp:5001
     if (ip->protocol == IPPROTO_UDP) {
         struct udphdr *udp = (void *)ip + (ip->ihl * 4);
         if ((void *)(udp+1) <= data_end && (bpf_ntohs(udp->dest)==53 || bpf_ntohs(udp->dest)==5001))
