@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Config A — stateless iptables FORWARD rules on xdp-firewall
-# Single direction (ens19 ingress equivalent) — matches B1/B2 scope
-# Only filters traffic FROM sender TO receiver — same as TC ingress on ens19
+# Bidirectional — dport AND sport — matches B1/B2 bidirectional scope
 
 set -euo pipefail
 ACTION=${1:-load}
@@ -11,25 +10,30 @@ case "$ACTION" in
         iptables -F FORWARD
         iptables -P FORWARD DROP
 
-        # TCP port 80 — destination only (matches B1/B2 scope)
+        # TCP port 80 — both directions
         iptables -A FORWARD -p tcp --dport 80 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 80 -j ACCEPT
 
-        # TCP port 443
+        # TCP port 443 — both directions
         iptables -A FORWARD -p tcp --dport 443 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 443 -j ACCEPT
 
-        # TCP port 5201 (iperf3)
+        # TCP port 5201 (iperf3) — both directions
         iptables -A FORWARD -p tcp --dport 5201 -j ACCEPT
+        iptables -A FORWARD -p tcp --sport 5201 -j ACCEPT
 
         # ICMP
         iptables -A FORWARD -p icmp -j ACCEPT
 
-        # UDP port 53 (DNS)
+        # UDP port 53 (DNS) — both directions
         iptables -A FORWARD -p udp --dport 53 -j ACCEPT
+        iptables -A FORWARD -p udp --sport 53 -j ACCEPT
 
-        # UDP port 5001 (pktgen)
+        # UDP port 5001 (pktgen) — both directions
         iptables -A FORWARD -p udp --dport 5001 -j ACCEPT
+        iptables -A FORWARD -p udp --sport 5001 -j ACCEPT
 
-        echo "✓ Config A (stateless, single-direction) loaded on xdp-firewall FORWARD chain"
+        echo "✓ Config A (stateless, bidirectional) loaded on xdp-firewall FORWARD chain"
         iptables -L FORWARD -v -n --line-numbers
         ;;
     flush)
