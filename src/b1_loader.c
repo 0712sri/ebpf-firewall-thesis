@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 
     if (argc == 3 && strcmp(argv[2], "detach") == 0) {
         tc_detach(ifindex);
-        printf("✓ Detached from %s\n", iface);
+        printf("Detached from %s\n", iface);
         return 0;
     }
 
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     err = tc_attach(ifindex, fd_input);
     if (err) return 1;
 
-    printf("✓ B1 attached to %s ingress\n", iface);
+    printf("B1 attached to %s ingress\n", iface);
     printf("  Press Ctrl+C to detach and exit\n\n");
 
     signal(SIGINT,  handle_sig);

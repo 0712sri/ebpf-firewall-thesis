@@ -77,10 +77,16 @@ int firewall_compressed(struct __sk_buff *skb)
         count(1); return TC_ACT_SHOT;
     }
 
-    // Rule 3 — ACCEPT tcp:80, tcp:443, tcp:5201 (HTTP, HTTPS, iperf3)
-    if (proto == IPPROTO_TCP &&
-        (dport == 80 || dport == 443 || dport == 5201)) {
+    // Rule 3 — ACCEPT tcp:80, tcp:443, tcp:5201 both directions
+    if (proto == IPPROTO_TCP) {
+    struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
+    if ((void *)(tcp + 1) > data_end) return TC_ACT_OK;
+    __u16 sport = bpf_ntohs(tcp->source);
+    if (dport == 80 || dport == 443 || dport == 5201 ||
+        sport == 80 || sport == 443 || sport == 5201) {
         count(0); return TC_ACT_OK;
+    }
+    count(1); return TC_ACT_SHOT;
     }
 
     // Rule 4 — ACCEPT udp:53 (DNS)
