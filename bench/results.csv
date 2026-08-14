@@ -52,3 +52,7 @@ timestamp,config,pkt_size,duration_s,pps,mbps,cpu_pct
 20260728_cpu_config_a,config_a,mpstat,30,2.32,22.35,77.53
 20260728_cpu_b2,b2,mpstat,30,2.23,21.89,77.97
 20260728_cpu_b1,b1,mpstat,30,2.06,23.44,76.41
+20260814_bare_bidir,bare,iperf3-tcp-bidir,30,2.32,0.24
+20260814_config_a_bidir,config_a_bidir,iperf3-tcp-bidir,30,2.37,0.15
+20260814_b2_bidir,b2_bidir,iperf3-tcp-bidir,30,2.32,0.17
+20260814_b1_bidir,b1_bidir,iperf3-tcp-bidir,30,2.29,0.34
