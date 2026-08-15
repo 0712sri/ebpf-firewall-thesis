@@ -57,15 +57,28 @@ int firewall_generated(struct __sk_buff *skb)
     }
 
     // ── Generated rules ───────────────────────────────────────────────────────
-    // Rule 1: conntrack ['RELATED', 'ESTABLISHED'] — skipped (stateless scope)
-    // Rule 2: {'proto': 'tcp', 'dst': '192.168.2.2/32', 'src': None, 'dport': 80, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
-    if (proto == IPPROTO_TCP && dst == 0xC0A80202U && dport == 80) { count(0); return TC_ACT_OK; }
-    // Rule 3: {'proto': 'tcp', 'dst': '192.168.2.2/32', 'src': None, 'dport': 443, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
-    if (proto == IPPROTO_TCP && dst == 0xC0A80202U && dport == 443) { count(0); return TC_ACT_OK; }
-    // Rule 4: {'proto': 'tcp', 'dst': '192.168.2.2/32', 'src': None, 'dport': 5201, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
-    if (proto == IPPROTO_TCP && dst == 0xC0A80202U && dport == 5201) { count(0); return TC_ACT_OK; }
-    // Rule 5: {'proto': 'icmp', 'dst': None, 'src': None, 'dport': None, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    // Rule 1: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': 80, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && dport == 80) { count(0); return TC_ACT_OK; }
+    // Rule 2: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': None, 'sport': 80, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && sport == 80) { count(0); return TC_ACT_OK; }
+    // Rule 3: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': 443, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && dport == 443) { count(0); return TC_ACT_OK; }
+    // Rule 4: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': None, 'sport': 443, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && sport == 443) { count(0); return TC_ACT_OK; }
+    // Rule 5: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': 5201, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && dport == 5201) { count(0); return TC_ACT_OK; }
+    // Rule 6: {'proto': 'tcp', 'dst': None, 'src': None, 'dport': None, 'sport': 5201, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_TCP && sport == 5201) { count(0); return TC_ACT_OK; }
+    // Rule 7: {'proto': 'icmp', 'dst': None, 'src': None, 'dport': None, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
     if (proto == IPPROTO_ICMP) { count(0); return TC_ACT_OK; }
+    // Rule 8: {'proto': 'udp', 'dst': None, 'src': None, 'dport': 53, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_UDP && dport == 53) { count(0); return TC_ACT_OK; }
+    // Rule 9: {'proto': 'udp', 'dst': None, 'src': None, 'dport': None, 'sport': 53, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_UDP && sport == 53) { count(0); return TC_ACT_OK; }
+    // Rule 10: {'proto': 'udp', 'dst': None, 'src': None, 'dport': 5001, 'sport': None, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_UDP && dport == 5001) { count(0); return TC_ACT_OK; }
+    // Rule 11: {'proto': 'udp', 'dst': None, 'src': None, 'dport': None, 'sport': 5001, 'verdict': 'ACCEPT', 'type': 'filter'}
+    if (proto == IPPROTO_UDP && sport == 5001) { count(0); return TC_ACT_OK; }
 
     // Default policy: DROP
     count(1); return TC_ACT_SHOT;
