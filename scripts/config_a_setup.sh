@@ -33,13 +33,13 @@ case "$ACTION" in
         iptables -A FORWARD -p udp --dport 5001 -j ACCEPT
         iptables -A FORWARD -p udp --sport 5001 -j ACCEPT
 
-        echo "✓ Config A (stateless, bidirectional) loaded on xdp-firewall FORWARD chain"
+        echo " Config A (stateless, bidirectional) loaded on xdp-firewall FORWARD chain"
         iptables -L FORWARD -v -n --line-numbers
         ;;
-    flush)
+        flush)
         iptables -F FORWARD
         iptables -P FORWARD ACCEPT
-        echo "✓ iptables FORWARD flushed"
+        echo " iptables FORWARD flushed"
         ;;
     *)
         echo "Usage: $0 [load|flush]"
