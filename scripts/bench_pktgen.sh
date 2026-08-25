@@ -19,7 +19,8 @@ PACKET_SIZES=(64 512 1280 1518)
 # Rates well below NIC ceiling (~32K pps)
 RATES=(1000 5000 10000 20000)
 
-echo "timestamp,config,pkt_size,target_pps,actual_pps,num_pkts,errors,duration_us" >> $RESULTS_FILE
+# Write header only if file does not exist
+[ -f "$RESULTS_FILE" ] || echo "timestamp,config,pkt_size,target_pps,actual_pps,num_pkts,errors,duration_us" > $RESULTS_FILE
 
 for PKT_SIZE in "${PACKET_SIZES[@]}"; do
     for PPS in "${RATES[@]}"; do
@@ -37,10 +38,6 @@ for PKT_SIZE in "${PACKET_SIZES[@]}"; do
 
         TIMESTAMP=$(date +%Y%m%d_%H%M%S)
         echo "${TIMESTAMP},${CONFIG},${PKT_SIZE},${PPS},${ACTUAL_PPS:-0},${NUM_PKTS},${ERRORS:-0},${DURATION:-0}" >> $RESULTS_FILE
-
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        echo "${TIMESTAMP},${CONFIG},${PKT_SIZE},${PPS},${ACTUAL_PPS},${NUM_PKTS},${ERRORS},${DURATION}" >> $RESULTS_FILE
-
         echo "Result: ${ACTUAL_PPS}pps errors=${ERRORS} duration=${DURATION}us"
 
         # Cool down between runs
