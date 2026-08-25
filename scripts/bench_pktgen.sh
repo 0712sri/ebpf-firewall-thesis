@@ -31,9 +31,12 @@ for PKT_SIZE in "${PACKET_SIZES[@]}"; do
 
         # Parse results
         RESULT=$(sudo cat /proc/net/pktgen/eth1)
-        ACTUAL_PPS=$(echo "$RESULT" | grep -oP '\d+pps' | grep -oP '\d+')
-        ERRORS=$(echo "$RESULT" | grep -oP 'errors: \d+' | grep -oP '\d+')
-        DURATION=$(echo "$RESULT" | grep -oP '\d+(?=\()' | head -1)
+        ACTUAL_PPS=$(echo "$RESULT" | grep "pps" | grep -oP '^\s+\d+pps' | grep -oP '\d+' | head -1)
+        ERRORS=$(echo "$RESULT" | grep "errors:" | tail -1 | grep -oP 'errors: \d+' | grep -oP '\d+')
+        DURATION=$(echo "$RESULT" | grep "Result:" | grep -oP '\d+(?=\()' | head -1)
+
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        echo "${TIMESTAMP},${CONFIG},${PKT_SIZE},${PPS},${ACTUAL_PPS:-0},${NUM_PKTS},${ERRORS:-0},${DURATION:-0}" >> $RESULTS_FILE
 
         TIMESTAMP=$(date +%Y%m%d_%H%M%S)
         echo "${TIMESTAMP},${CONFIG},${PKT_SIZE},${PPS},${ACTUAL_PPS},${NUM_PKTS},${ERRORS},${DURATION}" >> $RESULTS_FILE
