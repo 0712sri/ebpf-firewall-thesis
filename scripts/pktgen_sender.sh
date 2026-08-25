@@ -1,34 +1,33 @@
 #!/usr/bin/env bash
 # scripts/pktgen_sender.sh
-# Runs on xdp-sender — sends UDP packets toward xdp-receiver via xdp-firewall
-# Topology: xdp-sender (192.168.1.2) → xdp-firewall → xdp-receiver (192.168.2.2)
+# Follows: Turull et al. 2016 — Pktgen: Measuring performance on high speed networks
+# Sends exact packet count at controlled rate, multiple packet sizes
 #
 # Usage:
-#   sudo bash scripts/pktgen_sender.sh <pps> <duration_sec> <pkt_size>
-#   sudo bash scripts/pktgen_sender.sh 10000 30 64
+#   sudo bash scripts/pktgen_sender.sh <pps> <pkt_size> <num_packets>
+#   sudo bash scripts/pktgen_sender.sh 10000 64 100000
 
 set -euo pipefail
 
 PPS=${1:-10000}
-DURATION=${2:-30}
-PKT_SIZE=${3:-64}
+PKT_SIZE=${2:-64}
+NUM_PKTS=${3:-100000}
 IFACE=eth1
 DST_IP=192.168.2.2
-DST_MAC=bc:24:11:8e:2c:cb  # xdp-firewall ens19 (next hop)
+DST_MAC=bc:24:11:8e:2c:cb  # xdp-firewall ens19 next hop
 THREAD=kpktgend_0
 
-# Calculate delay in nanoseconds from PPS
-# delay = 1,000,000,000 / PPS
 DELAY=$(python3 -c "print(int(1000000000 / $PPS))")
 
-echo "[pktgen] PPS=$PPS  Duration=${DURATION}s  PktSize=${PKT_SIZE}B  Delay=${DELAY}ns"
+echo "[pktgen] PPS=$PPS  PktSize=${PKT_SIZE}B  NumPkts=$NUM_PKTS  Delay=${DELAY}ns"
+echo "[pktgen] Start: $(date +%s%N) ns"
 
 sudo modprobe pktgen 2>/dev/null || true
 
 sudo bash -c "
 echo 'rem_device_all'      > /proc/net/pktgen/$THREAD
 echo 'add_device $IFACE'   > /proc/net/pktgen/$THREAD
-echo 'count 0'             > /proc/net/pktgen/$IFACE
+echo 'count $NUM_PKTS'     > /proc/net/pktgen/$IFACE
 echo 'delay $DELAY'        > /proc/net/pktgen/$IFACE
 echo 'pkt_size $PKT_SIZE'  > /proc/net/pktgen/$IFACE
 echo 'dst $DST_IP'         > /proc/net/pktgen/$IFACE
@@ -39,10 +38,9 @@ echo 'udp_dst_min 5001'    > /proc/net/pktgen/$IFACE
 echo 'udp_dst_max 5001'    > /proc/net/pktgen/$IFACE
 "
 
-sudo bash -c "echo 'start' > /proc/net/pktgen/pgctrl" &
-sleep "$DURATION"
-sudo bash -c "echo 'stop' > /proc/net/pktgen/pgctrl"
+sudo bash -c "echo 'start' > /proc/net/pktgen/pgctrl"
 
+echo "[pktgen] End: $(date +%s%N) ns"
 echo ""
 echo "=== pktgen results ==="
-sudo cat /proc/net/pktgen/$IFACE | grep -E "Result|pps|pkts-sofar|errors"
+sudo cat /proc/net/pktgen/$IFACE | grep -E "Result|pps|pkts-sofar|errors|stopped"
