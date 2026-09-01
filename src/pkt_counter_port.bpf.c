@@ -2,6 +2,7 @@
 // src/pkt_counter_port.bpf.c
 // Counts UDP packets matching specific dst port on ens20
 // Used for forwarded packet counting in benchmark
+// Target port is set at runtime via target_port_map
 
 #include <linux/bpf.h>
 #include <linux/pkt_cls.h>
@@ -12,14 +13,21 @@
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_endian.h>
 
+// Runtime-configurable target port
+struct {
+    __uint(type, BPF_MAP_TYPE_ARRAY);
+    __uint(max_entries, 1);
+    __type(key, __u32);
+    __type(value, __u16);
+} target_port_map SEC(".maps");
+
+// Per-CPU forwarded packet counter
 struct {
     __uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
     __uint(max_entries, 1);
     __type(key, __u32);
     __type(value, __u64);
 } fwd_counter SEC(".maps");
-
-volatile const __u16 TARGET_PORT = 80;
 
 SEC("tc")
 int count_forwarded(struct __sk_buff *skb)
@@ -38,9 +46,13 @@ int count_forwarded(struct __sk_buff *skb)
     struct udphdr *udp = (void *)ip + (ip->ihl * 4);
     if ((void *)(udp + 1) > data_end) return TC_ACT_OK;
 
-    if (udp->dest != bpf_htons(TARGET_PORT)) return TC_ACT_OK;
-
+    // Read target port from map — set by userspace before benchmark
     __u32 key = 0;
+    __u16 *tport = bpf_map_lookup_elem(&target_port_map, &key);
+    if (!tport || *tport == 0) return TC_ACT_OK;
+    if (udp->dest != bpf_htons(*tport)) return TC_ACT_OK;
+
+    // Increment forwarded counter
     __u64 *cnt = bpf_map_lookup_elem(&fwd_counter, &key);
     if (cnt) __sync_fetch_and_add(cnt, 1);
 
