@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Config A — stateless iptables FORWARD rules on xdp-firewall
-# Bidirectional — dport AND sport — matches B1/B2 bidirectional scope
+# Bidirectional — dport AND sport — matches B1/B2 bidirectional scope(7rules)
 
 set -euo pipefail
 ACTION=${1:-load}
