@@ -29,13 +29,13 @@ sudo bash -c "
 echo 'rem_device_all'        > /proc/net/pktgen/$THREAD
 echo 'add_device $IFACE'     > /proc/net/pktgen/$THREAD
 echo 'count $NUM_PKTS'       > /proc/net/pktgen/$IFACE
-echo 'ratep $PPS'            > /proc/net/pktgen/$IFACE
+echo 'delay $DELAY'          > /proc/net/pktgen/$IFACE
 echo 'pkt_size $PKT_SIZE'    > /proc/net/pktgen/$IFACE
 echo 'dst $DST_IP'           > /proc/net/pktgen/$IFACE
 echo 'dst_mac $DST_MAC'      > /proc/net/pktgen/$IFACE
 echo 'src 192.168.1.2'       > /proc/net/pktgen/$IFACE
-echo "udp_dst_min $DST_PORT" > /proc/net/pktgen/$IFACE
-echo "udp_dst_max $DST_PORT" > /proc/net/pktgen/$IFACE
+echo 'udp_dst_min $DST_PORT' > /proc/net/pktgen/$IFACE
+echo 'udp_dst_max $DST_PORT' > /proc/net/pktgen/$IFACE
 echo 'udp_src_min 1024'      > /proc/net/pktgen/$IFACE
 echo 'udp_src_max 65535'     > /proc/net/pktgen/$IFACE
 echo 'start'                 > /proc/net/pktgen/pgctrl
