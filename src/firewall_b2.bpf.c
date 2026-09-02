@@ -90,10 +90,10 @@ int firewall_compressed(struct __sk_buff *skb)
     }
 
     // Rule 4 — ACCEPT udp:53 (DNS)
-    if (proto == IPPROTO_UDP && (dport == 53 || dport == 5001)) {
+    if (proto == IPPROTO_UDP && (dport == 53 || dport == 5001 ||
+    dport == 80 || dport == 5500 || dport == 9900)) {   
         count(0); return TC_ACT_OK;
     }
-
     // Rule 5 — ACCEPT ICMP
     if (proto == IPPROTO_ICMP) {
         count(0); return TC_ACT_OK;
