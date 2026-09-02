@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 # scripts/bench_pktgen.sh
-# Packet-processing benchmark using Linux pktgen,
-# informed by Turull et al. (2016) and RFC 2544 frame-loss procedure.
+# Packet-processing benchmark informed by Turull et al. (2016) and RFC 2544.
 #
-# Measures per pktgen run:
+# Measures per trial:
 #   - Offered packets (pktgen pkts-sofar)
-#   - Forwarded packets (tcpdump count on ens20 — benchmark port only)
-#   - Forwarded loss % = (offered - forwarded) / offered   [ACCEPT tests only]
-#   - pktgen-reported achieved PPS
-#   - pktgen run duration (generator elapsed time — NOT firewall processing time)
-#   - pktgen errors (generator-side errors)
-#   - Expected verdict (ACCEPT or DROP)
+#   - Forwarded packets (BPF counter on ens20 egress — benchmark port only)
+#   - Forwarded loss % = (offered - forwarded) / offered  [ACCEPT tests only]
+#   - pktgen achieved PPS
+#   - pktgen run duration (generator elapsed time)
+#   - pktgen errors
+#
+# Run on: xdp-sender
+# Requires: pkt_counter_port.bpf.o attached to ens20 egress on xdp-firewall
 #
 # Usage:
 #   sudo bash scripts/bench_pktgen.sh <config> <rule_count> <match_pos> <verdict>
@@ -19,11 +20,9 @@
 #   verdict:   accept | drop
 #
 # Examples:
-#   sudo bash scripts/bench_pktgen.sh b2 10 best accept
-#   sudo bash scripts/bench_pktgen.sh config_a 100 worst accept
+#   sudo bash scripts/bench_pktgen.sh config_a 10 best accept
+#   sudo bash scripts/bench_pktgen.sh b2 100 worst accept
 #   sudo bash scripts/bench_pktgen.sh b2 10 miss drop
-#
-# Run on: xdp-sender
 
 set -euo pipefail
 
@@ -31,36 +30,30 @@ CONFIG=${1:-unknown}
 RULE_COUNT=${2:-10}
 MATCH_POS=${3:-best}
 VERDICT=${4:-accept}
-
-# Fixed packet count per run — realistic for rate range used
-# At 1k pps: 10k pkts = 10 seconds. At 30k pps: 10k pkts = 0.3 seconds.
-# Use 30k packets for all runs — ~1-30 seconds depending on rate.
-NUM_PKTS=30000
-REPETITIONS=5
 FIREWALL_HOST="xdp-firewall"
-EGRESS_IFACE="ens20"
 RESULTS_FILE="bench/pktgen_results.csv"
-DST_IP="192.168.2.2"
-PKTGEN_IFACE="eth1"
-THREAD="kpktgend_0"
-DST_MAC="bc:24:11:8e:2c:cb"
 
-# Packet sizes (bytes) — covers full range per RFC 2544
+# Port based on match position — must match rule_generator.py output
+case "$MATCH_POS" in
+    best)   DST_PORT=80    ;;
+    middle) DST_PORT=5500  ;;
+    worst)  DST_PORT=9900  ;;
+    miss)   DST_PORT=9999  ;;
+    *) echo "ERROR: match_pos must be best|middle|worst|miss"; exit 1 ;;
+esac
+
+# Packet sizes per RFC 2544
 PACKET_SIZES=(64 128 256 512 1024 1518)
 
 # Offered rates (pps) — sweep from low to above NIC ceiling
-# Fine-grained around known saturation region (~32k pps)
 RATES=(1000 5000 10000 15000 20000 25000 30000 35000 40000)
 
-# Destination port determines which rule is matched
-# Adjust these to match your actual ruleset order
-case "$MATCH_POS" in
-    best)   DST_PORT=80     ;;   # matches first ACCEPT rule
-    middle) DST_PORT=5201   ;;   # matches middle ACCEPT rule
-    worst)  DST_PORT=10000  ;;   # matches last ACCEPT rule
-    miss)   DST_PORT=9999   ;;   # matches no rule → default DROP
-    *)      echo "ERROR: match_pos must be best|middle|worst|miss"; exit 1 ;;
-esac
+# Repetitions per configuration
+REPETITIONS=3
+
+# Duration target: 10 seconds per trial
+# Packet count = rate × 10
+DURATION_S=10
 
 # Write CSV header only if file does not exist
 if [ ! -f "$RESULTS_FILE" ]; then
@@ -68,80 +61,72 @@ if [ ! -f "$RESULTS_FILE" ]; then
 fi
 
 echo "========================================================"
-echo " Firewall Benchmark (Turull et al. 2016 / RFC 2544)"
+echo " Firewall Benchmark — Turull et al. 2016 / RFC 2544"
 echo "========================================================"
-echo " Config:          $CONFIG"
-echo " Rule count:      $RULE_COUNT"
-echo " Match position:  $MATCH_POS (dst_port=$DST_PORT)"
-echo " Expected verdict:$VERDICT"
-echo " Packets/run:     $NUM_PKTS"
-echo " Repetitions:     $REPETITIONS"
-echo " Packet sizes:    ${PACKET_SIZES[*]} bytes"
-echo " Rates (pps):     ${RATES[*]}"
+echo " Config:    $CONFIG  |  Rules: $RULE_COUNT"
+echo " Match pos: $MATCH_POS (port=$DST_PORT)  |  Verdict: $VERDICT"
+echo " Sizes:     ${PACKET_SIZES[*]} bytes"
+echo " Rates:     ${RATES[*]} pps"
+echo " Duration:  ${DURATION_S}s per trial  |  Reps: $REPETITIONS"
 echo "========================================================"
+
+# Setup BPF counter on firewall for this port
+echo "Setting up BPF counter on xdp-firewall ens20 for port $DST_PORT..."
+ssh "$FIREWALL_HOST" "
+    sudo tc filter del dev ens20 egress 2>/dev/null || true
+    sudo tc filter add dev ens20 egress bpf obj ~/ebpf-firewall-thesis/obj/pkt_counter_port.bpf.o sec tc direct-action
+    sudo bash ~/ebpf-firewall-thesis/scripts/set_counter_port.sh $DST_PORT
+"
+echo "✓ Counter ready"
 
 sudo modprobe pktgen 2>/dev/null || true
 
 for PKT_SIZE in "${PACKET_SIZES[@]}"; do
     for PPS in "${RATES[@]}"; do
+
+        # Fixed 10-second duration — packet count scales with rate
+        NUM_PKTS=$(( PPS * DURATION_S ))
+
         for REP in $(seq 1 $REPETITIONS); do
 
             echo ""
-            echo "--- PktSize=${PKT_SIZE}B  Rate=${PPS}pps  Rep=${REP}/${REPETITIONS} ---"
+            echo "--- Config=$CONFIG  Size=${PKT_SIZE}B  Rate=${PPS}pps  Rep=${REP}/${REPETITIONS}  Pkts=$NUM_PKTS ---"
 
-            # Start tcpdump on xdp-firewall ens20 counting only benchmark packets
-            # Count UDP packets with specific dst port — excludes all other traffic
-            TCPDUMP_PID=""
-            TCPDUMP_FILE="/tmp/bench_fwd_${PKT_SIZE}_${PPS}_${REP}.txt"
+            # Reset BPF counter by reattaching
+            ssh "$FIREWALL_HOST" "
+                sudo tc filter del dev ens20 egress 2>/dev/null || true
+                sudo tc filter add dev ens20 egress bpf obj ~/ebpf-firewall-thesis/obj/pkt_counter_port.bpf.o sec tc direct-action
+                sudo bash ~/ebpf-firewall-thesis/scripts/set_counter_port.sh $DST_PORT
+            " 2>/dev/null
 
-            ssh "$FIREWALL_HOST" "sudo tcpdump -i $EGRESS_IFACE -c 1000000 \
-                udp dst port $DST_PORT -w /tmp/bench_cap.pcap 2>/tmp/tcpdump_err.txt &
-                echo \$!" > /tmp/remote_pid.txt
-            REMOTE_PID=$(cat /tmp/remote_pid.txt)
-            sleep 0.5  # let tcpdump start
+            sleep 0.5  # let counter settle
 
-            # Configure pktgen — use ratep for native PPS control
-            sudo bash -c "
-echo 'rem_device_all'         > /proc/net/pktgen/$THREAD
-echo 'add_device $PKTGEN_IFACE' > /proc/net/pktgen/$THREAD
-echo 'count $NUM_PKTS'        > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'ratep $PPS'             > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'pkt_size $PKT_SIZE'     > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'dst $DST_IP'            > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'dst_mac $DST_MAC'       > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'udp_dst_min $DST_PORT'  > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'udp_dst_max $DST_PORT'  > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'udp_src_min 1024'       > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'udp_src_max 65535'      > /proc/net/pktgen/$PKTGEN_IFACE
-echo 'start'                  > /proc/net/pktgen/pgctrl
-"
-            # Stop tcpdump on firewall and count forwarded packets
-            ssh "$FIREWALL_HOST" "sudo kill $REMOTE_PID 2>/dev/null; \
-                sleep 0.5; \
-                sudo tcpdump -r /tmp/bench_cap.pcap udp dst port $DST_PORT 2>/dev/null | wc -l" \
-                > "$TCPDUMP_FILE" 2>/dev/null || echo "0" > "$TCPDUMP_FILE"
+            # Run pktgen
+            sudo bash scripts/pktgen_sender.sh $PPS $PKT_SIZE $NUM_PKTS $DST_PORT
 
-            FORWARDED=$(cat "$TCPDUMP_FILE" | tail -1 | tr -d ' ')
+            # Read forwarded count from BPF counter
+            FORWARDED=$(ssh "$FIREWALL_HOST" \
+                "sudo bash ~/ebpf-firewall-thesis/scripts/read_fwd_counter.sh" \
+                | tail -1 | tr -d ' \n')
 
             # Parse pktgen results
-            RESULT=$(sudo cat /proc/net/pktgen/$PKTGEN_IFACE)
+            RESULT=$(sudo cat /proc/net/pktgen/eth1)
             OFFERED=$(echo "$RESULT" | grep "pkts-sofar" | grep -oP '\d+' | head -1)
             PKTGEN_ERRORS=$(echo "$RESULT" | grep "errors:" | tail -1 | grep -oP 'errors: \d+' | grep -oP '\d+' || echo "0")
             ACHIEVED_PPS=$(echo "$RESULT" | grep -oP '\d+pps' | head -1 | grep -oP '\d+' || echo "0")
             DURATION=$(echo "$RESULT" | grep "Result:" | grep -oP '\d+(?=\()' | head -1 || echo "0")
 
-            # Calculate forwarded loss % — only meaningful for ACCEPT tests
+            # Calculate loss — only meaningful for ACCEPT tests
             if [ "$VERDICT" = "accept" ] && [ "${OFFERED:-0}" -gt 0 ]; then
                 LOSS_PCT=$(python3 -c "
-offered=${OFFERED:-0}
-fwd=${FORWARDED:-0}
+offered=int('${OFFERED:-0}')
+fwd=int('${FORWARDED:-0}')
 lost=offered-fwd
 pct=(lost/offered)*100 if offered>0 else 0
 print(f'{pct:.4f}')
 ")
             else
-                # DROP test — egress=0 is correct behaviour, not loss
-                LOSS_PCT="N/A (DROP test)"
+                LOSS_PCT="N/A"
             fi
 
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -149,19 +134,14 @@ print(f'{pct:.4f}')
             # Write to CSV
             echo "${TIMESTAMP},${CONFIG},${RULE_COUNT},${MATCH_POS},${DST_PORT},${VERDICT},${PKT_SIZE},${PPS},${OFFERED:-0},${PKTGEN_ERRORS:-0},${ACHIEVED_PPS:-0},${DURATION:-0},${FORWARDED:-0},${LOSS_PCT},${REP}" >> "$RESULTS_FILE"
 
-            echo "  Offered:      ${OFFERED:-0} pkts"
-            echo "  pktgen errors:${PKTGEN_ERRORS:-0}"
-            echo "  Achieved PPS: ${ACHIEVED_PPS:-0}"
-            echo "  Duration:     ${DURATION:-0} us  (generator elapsed time)"
-            echo "  Forwarded:    ${FORWARDED:-0} pkts  (ens20, dst_port=$DST_PORT only)"
-            echo "  Loss:         ${LOSS_PCT}"
+            echo "  Offered:   ${OFFERED:-0} pkts"
+            echo "  Forwarded: ${FORWARDED:-0} pkts"
+            echo "  Loss:      ${LOSS_PCT}"
+            echo "  PPS:       ${ACHIEVED_PPS:-0}"
+            echo "  Duration:  ${DURATION:-0} us (generator elapsed)"
+            echo "  Errors:    ${PKTGEN_ERRORS:-0}"
 
-            # Clean up temp files
-            rm -f "$TCPDUMP_FILE" /tmp/remote_pid.txt
-            ssh "$FIREWALL_HOST" "sudo rm -f /tmp/bench_cap.pcap /tmp/tcpdump_err.txt" 2>/dev/null || true
-
-            # Cool down between runs
-            sleep 3
+            sleep 2
         done
     done
 done
