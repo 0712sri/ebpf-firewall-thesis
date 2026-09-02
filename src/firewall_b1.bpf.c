@@ -91,7 +91,8 @@ SEC("tc") int chain_forward(struct __sk_buff *skb) {
     // Rule 6 — ACCEPT udp:53 and udp:5001
     if (ip->protocol == IPPROTO_UDP) {
         struct udphdr *udp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(udp+1) <= data_end && (bpf_ntohs(udp->dest)==53 || bpf_ntohs(udp->dest)==5001))
+        if ((void *)(udp+1) <= data_end && (bpf_ntohs(udp->dest)==53 || bpf_ntohs(udp->dest)==5001 ||
+    bpf_ntohs(udp->dest)==80 || bpf_ntohs(udp->dest)==5500 || bpf_ntohs(udp->dest)==9900))
             { count(0,2,skb->len); return TC_ACT_OK; }
     }
 
