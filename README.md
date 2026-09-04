@@ -111,9 +111,4 @@ sudo bash scripts/read_fwd_counter.sh
 | Instructions | — | N/A | 265 | 126 |
 | Tail-calls/packet | 0 | N/A | 2 | 0 |---
 
-## Key References
 
-- Turull, D., Sjödin, P., Olsson, R. (2016). Pktgen: Measuring performance on high speed networks. *Computer Communications*, 82, 39–48.
-- Miano et al. (2019). bpf-iptables (SIGCOMM CCR Best Paper 2020)
-- Høiland-Jørgensen et al. (2018). The eXpress Data Path
-- RFC 2544 — Benchmarking methodology for network interconnect devices
