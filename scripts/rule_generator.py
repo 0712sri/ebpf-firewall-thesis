@@ -3,7 +3,7 @@
 scripts/rule_generator.py
 Generates firewall rules for benchmark experiments.
 Creates N rules where:
-  Rule 1   = port 5001   (best case match)
+  Rule 1   = port 80   (best case match)
   Rule N/2 = port 5500 (middle case match)
   Rule N   = port 9900 (worst case match)
   Miss     = port 9999 (no rule → default DROP)
@@ -19,7 +19,7 @@ import subprocess
 
 def generate_ports(n):
     ports = []
-    ports.append(5001)          # rule 1 — best case
+    ports.append(80)          # rule 1 — best case
     base = 10000
     for i in range(1, n - 1):
         if i == n // 2 - 1:
@@ -32,7 +32,7 @@ def generate_ports(n):
 
 def print_port_map(n, ports):
     print(f"\n=== Port map for N={n} ===")
-    print(f"  BEST   : port 5001   → rule 1")
+    print(f"  BEST   : port 80   → rule 1")
     print(f"  MIDDLE : port 5500 → rule {n//2}")
     print(f"  WORST  : port 9900 → rule {n}")
     print(f"  MISS   : port 9999 → default DROP")
@@ -63,7 +63,7 @@ def main():
         if apply_rules:
             for c in cmds:
                 subprocess.run(["sudo"] + c.split(), check=True)
-            print("✓ Applied")
+            print("Applied")
 
     elif config == "b2":
         print(f"\n=== BPF rules ({n} rules) ===")
@@ -81,7 +81,7 @@ def main():
     import os
     os.makedirs("bench", exist_ok=True)
     with open(f"bench/portmap_{n}.txt", "w") as f:
-        f.write(f"BEST_PORT=5001\nMIDDLE_PORT=5500\nWORST_PORT=9900\nMISS_PORT=9999\nRULE_COUNT={n}\n")
+        f.write(f"BEST_PORT=80\nMIDDLE_PORT=5500\nWORST_PORT=9900\nMISS_PORT=9999\nRULE_COUNT={n}\n")
     print(f"\n✓ Port map saved to bench/portmap_{n}.txt")
 
 if __name__ == "__main__":
