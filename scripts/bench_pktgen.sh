@@ -21,7 +21,7 @@ VERDICT=${4:-accept}
 RESULTS_FILE="bench/pktgen_results.csv"
 
 case "$MATCH_POS" in
-    best)   DST_PORT=5001  ;;
+    best)   DST_PORT=80  ;;
     middle) DST_PORT=5500  ;;
     worst)  DST_PORT=9900  ;;
     miss)   DST_PORT=9999  ;;
