@@ -104,7 +104,7 @@ print(f'{pct:.4f}')
             fi
 
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-            echo "${TIMESTAMP},${CONFIG},${RULE_COUNT},${MATCH_POS},${DST_PORT},${VERDICT},${PKT_SIZE},${PPS},${OFFERED:-0},${PKTGEN_ERRORS:-0},${ACHIEVED_PPS:-0},${DURATION:-0},${REP}" >> "$RESULTS_FILE"
+            echo "${TIMESTAMP},${CONFIG},${RULE_COUNT},${MATCH_POS},${DST_PORT},${VERDICT},${PKT_SIZE},${PPS},${OFFERED:-0},${PKTGEN_ERRORS:-0},${ACHIEVED_PPS:-0},${DURATION:-0},${FORWARDED:-0},${LOSS_PCT},${REP}" >> "$RESULTS_FILE"
 
             echo "  Forwarded: $FORWARDED  |  Loss: $LOSS_PCT"
             sleep 1
