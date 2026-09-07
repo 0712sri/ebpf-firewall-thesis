@@ -3,14 +3,16 @@
 # Packet-processing benchmark informed by Turull et al. (2016) and RFC 2544.
 # Run on: xdp-sender
 #
-# BEFORE running this script, on xdp-firewall run:
-#   sudo bash scripts/setup_counter.sh <dst_port>
-#
-# AFTER each config, on xdp-firewall read counter:
-#   sudo bash scripts/read_fwd_counter.sh
+# BEFORE running: on xdp-firewall run:
+#   sudo bash scripts/setup_benchmark.sh <config> <rule_count> <dst_port>
 #
 # Usage:
 #   sudo bash scripts/bench_pktgen.sh <config> <rule_count> <match_pos> <verdict>
+#
+# Examples:
+#   sudo bash scripts/bench_pktgen.sh b2 10 best accept
+#   sudo bash scripts/bench_pktgen.sh b1 10 worst accept
+#   sudo bash scripts/bench_pktgen.sh config_a 10 miss drop
 
 set -euo pipefail
 
@@ -21,24 +23,24 @@ VERDICT=${4:-accept}
 RESULTS_FILE="bench/pktgen_results.csv"
 
 case "$MATCH_POS" in
-    best)   DST_PORT=80  ;;
-    middle) DST_PORT=5500  ;;
-    worst)  DST_PORT=9900  ;;
-    miss)   DST_PORT=9999  ;;
+    best)   DST_PORT=80   ;;
+    middle) DST_PORT=5500 ;;
+    worst)  DST_PORT=9900 ;;
+    miss)   DST_PORT=9999 ;;
     *) echo "ERROR: match_pos must be best|middle|worst|miss"; exit 1 ;;
 esac
 
-PACKET_SIZES=(128 256 512 1024 1518)
+PACKET_SIZES=(64 128 256 512 1024)
 RATES=(10000 20000 30000 40000 50000)
 REPETITIONS=3
 DURATION_S=10
 
 if [ ! -f "$RESULTS_FILE" ]; then
-    echo "timestamp,config,rule_count,match_pos,dst_port,expected_verdict,pkt_size_bytes,target_pps,offered_pkts,pktgen_errors,pktgen_achieved_pps,pktgen_duration_us,repetition" > "$RESULTS_FILE"
+    echo "timestamp,config,rule_count,match_pos,dst_port,expected_verdict,pkt_size_bytes,target_pps,offered_pkts,pktgen_errors,pktgen_achieved_pps,pktgen_duration_us,forwarded_pkts,forwarded_loss_pct,repetition" > "$RESULTS_FILE"
 fi
 
 echo "========================================================"
-echo " Firewall Benchmark "
+echo " Firewall Benchmark Setup"
 echo "========================================================"
 echo " Config:    $CONFIG  |  Rules: $RULE_COUNT"
 echo " Match pos: $MATCH_POS (port=$DST_PORT)  |  Verdict: $VERDICT"
@@ -47,13 +49,10 @@ echo " Rates:     ${RATES[*]} pps"
 echo " Duration:  ${DURATION_S}s per trial  |  Reps: $REPETITIONS"
 echo "========================================================"
 echo ""
-echo "   On xdp-firewall run this now:"
-echo "   sudo tc filter del dev ens20 egress 2>/dev/null || true"
-echo "   sudo tc qdisc add dev ens20 clsact 2>/dev/null || true"
-echo "   sudo tc filter add dev ens20 egress bpf obj obj/pkt_counter_port.bpf.o sec tc direct-action"
-echo "   sudo bash scripts/set_counter_port.sh $DST_PORT"
+echo "  On xdp-firewall run:"
+echo "   sudo bash scripts/setup_benchmark.sh $CONFIG $RULE_COUNT $DST_PORT"
 echo ""
-read -p "Press ENTER when counter is ready on xdp-firewall..."
+read -p "Press ENTER when xdp-firewall is ready..."
 
 sudo modprobe pktgen 2>/dev/null || true
 
@@ -66,8 +65,7 @@ for PKT_SIZE in "${PACKET_SIZES[@]}"; do
 
             echo ""
             echo "--- Size=${PKT_SIZE}B  Rate=${PPS}pps  Rep=${REP}/${REPETITIONS}  Pkts=$NUM_PKTS ---"
-            echo "   Reset counter on xdp-firewall:"
-            echo "   sudo tc filter del dev ens20 egress && sudo tc filter add dev ens20 egress bpf obj obj/pkt_counter_port.bpf.o sec tc direct-action && sudo bash scripts/set_counter_port.sh $DST_PORT"
+            echo "  On xdp-firewall: sudo bash scripts/reset_counter.sh $DST_PORT"
             read -p "Press ENTER when counter is reset..."
 
             # Run pktgen
@@ -86,9 +84,8 @@ for PKT_SIZE in "${PACKET_SIZES[@]}"; do
             echo "  Duration: ${DURATION:-0} us"
             echo "  Errors:   ${PKTGEN_ERRORS:-0}"
             echo ""
-            echo "   On xdp-firewall read counter:"
-            echo "   sudo bash scripts/read_fwd_counter.sh"
-            read -p "Enter forwarded packet count from xdp-firewall: " FORWARDED
+            echo "  On xdp-firewall: sudo bash scripts/read_fwd_counter.sh"
+            read -p "Enter forwarded packet count: " FORWARDED
 
             # Calculate loss
             if [ "$VERDICT" = "accept" ] && [ "${OFFERED:-0}" -gt 0 ]; then
