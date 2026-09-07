@@ -28,7 +28,7 @@ case "$MATCH_POS" in
     *) echo "ERROR: match_pos must be best|middle|worst|miss"; exit 1 ;;
 esac
 
-PACKET_SIZES=(64 512 1518)
+PACKET_SIZES=(128 256 512 1024 1518)
 RATES=(10000 20000 30000 40000 50000)
 REPETITIONS=3
 DURATION_S=10
