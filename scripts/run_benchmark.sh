@@ -45,6 +45,54 @@ DURATION_S=10
 if [ ! -f "$RESULTS_FILE" ]; then
     echo "timestamp,config,rule_count,match_pos,dst_port,expected_verdict,pkt_size_bytes,target_pps,offered_pkts,pktgen_errors,pktgen_achieved_pps,pktgen_duration_us,forwarded_pkts,forwarded_loss_pct,repetition" > "$RESULTS_FILE"
 fi
+#!/usr/bin/env bash
+# scripts/run_benchmark.sh
+# Laptop-side benchmark orchestrator
+# Controls xdp-sender and xdp-firewall independently via SSH
+# No VM-to-VM SSH — laptop is the controller
+#
+# Usage:
+#   bash scripts/run_benchmark.sh <config> <rule_count> <match_pos> <verdict>
+
+set -euo pipefail
+
+CONFIG=${1:-b2}
+RULE_COUNT=${2:-10}
+MATCH_POS=${3:-best}
+VERDICT=${4:-accept}
+
+SENDER="ubuntu@10.8.50.179"
+FIREWALL="ubuntu@10.8.50.175"
+SENDER_REPO="/home/ubuntu/ebpf-firewall-thesis"
+FIREWALL_REPO="/home/ubuntu/ebpf-firewall-thesis"
+RESULTS_FILE="bench/pktgen_results.csv"
+SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyJump=bastion"
+
+# Read port map from generated file
+PORTMAP="bench/portmap_${RULE_COUNT}.txt"
+if [ ! -f "$PORTMAP" ]; then
+    echo "ERROR: port map not found — run: python3 scripts/rule_generator.py $RULE_COUNT config_a"
+    exit 1
+fi
+source "$PORTMAP"
+
+case "$MATCH_POS" in
+    best)   DST_PORT=$BEST_PORT   ;;
+    middle) DST_PORT=$MIDDLE_PORT ;;
+    worst)  DST_PORT=$WORST_PORT  ;;
+    miss)   DST_PORT=$MISS_PORT   ;;
+    *) echo "ERROR: match_pos must be best|middle|worst|miss"; exit 1 ;;
+esac
+
+# Test config — change for full run
+PACKET_SIZES=(64)
+RATES=(10000)
+REPETITIONS=1
+DURATION_S=10
+
+if [ ! -f "$RESULTS_FILE" ]; then
+    echo "timestamp,config,rule_count,match_pos,dst_port,expected_verdict,pkt_size_bytes,target_pps,offered_pkts,pktgen_errors,pktgen_achieved_pps,pktgen_duration_us,forwarded_pkts,forwarded_loss_pct,repetition" > "$RESULTS_FILE"
+fi
 
 echo "========================================================"
 echo " Benchmark Orchestrator — laptop controls both VMs"
@@ -56,10 +104,10 @@ echo " Rates:     ${RATES[*]} pps"
 echo " Duration:  ${DURATION_S}s per trial  |  Reps: $REPETITIONS"
 echo "========================================================"
 
-# Setup firewall once — loads all N rules and attaches firewall program
+# Setup firewall once
 echo ""
 echo "[setup] Configuring xdp-firewall..."
-ssh -o StrictHostKeyChecking=no "$FIREWALL" \
+ssh $SSH_OPTS "$FIREWALL" \
     "cd $FIREWALL_REPO && sudo bash scripts/setup_benchmark.sh $CONFIG $RULE_COUNT $DST_PORT"
 echo "[setup] xdp-firewall ready"
 
@@ -74,20 +122,20 @@ for PKT_SIZE in "${PACKET_SIZES[@]}"; do
             echo ""
             echo "--- Size=${PKT_SIZE}B  Rate=${PPS}pps  Rep=${REP}/${REPETITIONS} ---"
 
-            # Reset counter on firewall — verify it is zero before proceeding
-            ssh -o StrictHostKeyChecking=no "$FIREWALL" \
+            # Reset counter on firewall
+            ssh $SSH_OPTS "$FIREWALL" \
                 "cd $FIREWALL_REPO && sudo bash scripts/reset_counter.sh $DST_PORT"
 
             # Run pktgen on sender
-            ssh -o StrictHostKeyChecking=no "$SENDER" \
+            ssh $SSH_OPTS "$SENDER" \
                 "cd $SENDER_REPO && sudo bash scripts/pktgen_sender.sh $PPS $PKT_SIZE $NUM_PKTS $DST_PORT"
 
-            # Read counter from firewall — guaranteed single integer
-            FORWARDED=$(ssh -o StrictHostKeyChecking=no "$FIREWALL" \
+            # Read counter from firewall
+            FORWARDED=$(ssh $SSH_OPTS "$FIREWALL" \
                 "cd $FIREWALL_REPO && sudo bash scripts/read_fwd_counter.sh")
 
             # Parse pktgen results from sender
-            RESULT=$(ssh -o StrictHostKeyChecking=no "$SENDER" \
+            RESULT=$(ssh $SSH_OPTS "$SENDER" \
                 "sudo cat /proc/net/pktgen/eth1")
             OFFERED=$(echo "$RESULT" | grep "pkts-sofar" | grep -oP '\d+' | head -1)
             PKTGEN_ERRORS=$(echo "$RESULT" | grep "errors:" | tail -1 | grep -oP 'errors: \d+' | grep -oP '\d+' || echo "0")
