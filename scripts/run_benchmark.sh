@@ -37,7 +37,7 @@ case "$MATCH_POS" in
 esac
 
 # Test config — change for full run
-PACKET_SIZES=(64 512 1518)
+PACKET_SIZES=(64 128 256 512 1024 1400)
 RATES=(10000 20000 30000 40000 50000)
 REPETITIONS=3
 DURATION_S=10
@@ -85,10 +85,9 @@ case "$MATCH_POS" in
 esac
 
 # Test config — change for full run
-PACKET_SIZES=(64)
-RATES=(10000)
-REPETITIONS=1
-DURATION_S=10
+PACKET_SIZES=(64 128 256 512 1024 1400)
+RATES=(10000 20000 30000 40000 50000)
+REPETITIONS=3
 
 if [ ! -f "$RESULTS_FILE" ]; then
     echo "timestamp,config,rule_count,match_pos,dst_port,expected_verdict,pkt_size_bytes,target_pps,offered_pkts,pktgen_errors,pktgen_achieved_pps,pktgen_duration_us,forwarded_pkts,forwarded_loss_pct,repetition" > "$RESULTS_FILE"
