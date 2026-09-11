@@ -36,6 +36,10 @@ sudo bash scripts/tc_attach.sh detach ens19 2>/dev/null || true
 case "$CONFIG" in
     config_a)
         echo "  iptables rules already applied — no BPF attachment needed"
+        # Add SSH safety rule so management access is not lost
+        sudo iptables -I FORWARD 1 -p tcp -s 10.8.50.0/24 --dport 22 -j ACCEPT
+        sudo iptables -I FORWARD 1 -p tcp -s 10.8.50.0/24 --sport 22 -j ACCEPT
+        echo "  SSH safety rules inserted at position 1"
         ;;
     b2)
         sudo bash scripts/tc_attach.sh attach ens19 obj/firewall_b2.bpf.o tc
