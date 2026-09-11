@@ -41,9 +41,11 @@ case "$CONFIG" in
         sudo bash scripts/tc_attach.sh attach ens19 obj/firewall_b2.bpf.o tc
         ;;
     b1)
-        sudo ./obj/b1_loader ens19 &
-        sleep 2
-        echo "  B1 loader running as background process"
+        sudo pkill b1_loader 2>/dev/null || true
+        sleep 1
+        sudo nohup ./obj/b1_loader ens19 > /tmp/b1_loader.log 2>&1 &
+        sleep 3
+        echo "  B1 loader running (nohup) — log at /tmp/b1_loader.log"
         ;;
     *)
         echo "ERROR: unknown config $CONFIG"
