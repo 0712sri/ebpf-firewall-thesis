@@ -66,7 +66,7 @@ FIREWALL="ubuntu@10.8.50.175"
 SENDER_REPO="/home/ubuntu/ebpf-firewall-thesis"
 FIREWALL_REPO="/home/ubuntu/ebpf-firewall-thesis"
 RESULTS_FILE="bench/pktgen_results.csv"
-SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyJump=bastion"
+SSH_OPTS="-o StrictHostKeyChecking=no -o ProxyJump=bastion -o ServerAliveInterval=10 -o ServerAliveCountMax=6"
 
 # Read port map from generated file
 PORTMAP="bench/portmap_${RULE_COUNT}.txt"
