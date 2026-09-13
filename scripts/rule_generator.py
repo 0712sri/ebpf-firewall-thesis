@@ -82,7 +82,7 @@ def main():
     os.makedirs("bench", exist_ok=True)
     with open(f"bench/portmap_{n}.txt", "w") as f:
         f.write(f"BEST_PORT=80\nMIDDLE_PORT=5500\nWORST_PORT=9900\nMISS_PORT=9999\nRULE_COUNT={n}\n")
-    print(f"\n✓ Port map saved to bench/portmap_{n}.txt")
+    print(f"\n Port map saved to bench/portmap_{n}.txt")
 
 if __name__ == "__main__":
     main()

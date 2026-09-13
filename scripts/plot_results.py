@@ -59,7 +59,7 @@ ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.4f'))
 plt.tight_layout()
 plt.savefig('bench/plots/plot1_pps_vs_loss_best64.png', dpi=150)
 plt.close()
-print("✓ Plot 1 saved")
+print(" Plot 1 saved")
 
 # ── Plot 2: Rule position effect on B2 — 64B ─────────────────────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -81,7 +81,7 @@ ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.4f'))
 plt.tight_layout()
 plt.savefig('bench/plots/plot2_rule_position_b2_64.png', dpi=150)
 plt.close()
-print("✓ Plot 2 saved")
+print(" Plot 2 saved")
 
 # ── Plot 3: B1 vs B2 rule position comparison — worst case ───────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -107,7 +107,7 @@ ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.4f'))
 plt.tight_layout()
 plt.savefig('bench/plots/plot3_b1_vs_b2_position.png', dpi=150)
 plt.close()
-print("✓ Plot 3 saved")
+print(" Plot 3 saved")
 
 # ── Plot 4: Packet size effect — B2 best case ─────────────────────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -128,7 +128,7 @@ ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.4f'))
 plt.tight_layout()
 plt.savefig('bench/plots/plot4_pkt_size_b2.png', dpi=150)
 plt.close()
-print("✓ Plot 4 saved")
+print(" Plot 4 saved")
 
 # ── Plot 5: Config A vs B1 vs B2 — worst case, 64B ───────────────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -172,6 +172,6 @@ ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig('bench/plots/plot6_offered_vs_achieved.png', dpi=150)
 plt.close()
-print("✓ Plot 6 saved")
+print(" Plot 6 saved")
 
 print("\nAll plots saved to bench/plots/")

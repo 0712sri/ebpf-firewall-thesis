@@ -249,7 +249,7 @@ def main():
     with open(outfile, 'w') as f:
         f.write(code)
 
-    print(f"✓ Written: {outfile}", file=sys.stderr)
+    print(f" Written: {outfile}", file=sys.stderr)
     print(code)
 
 

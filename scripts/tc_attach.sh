@@ -7,12 +7,12 @@ case "$ACTION" in
     tc qdisc add dev "$IFACE" clsact 2>/dev/null || true
     tc filter del dev "$IFACE" ingress 2>/dev/null || true
     tc filter add dev "$IFACE" ingress bpf obj "$OBJ" sec "$SEC" direct-action
-    echo "✓ Attached $OBJ → $IFACE ingress"
+    echo " Attached $OBJ → $IFACE ingress"
     tc filter show dev "$IFACE" ingress ;;
   detach)
     tc filter del dev "$IFACE" ingress 2>/dev/null || true
     tc qdisc del dev "$IFACE" clsact 2>/dev/null || true
-    echo "✓ Detached from $IFACE" ;;
+    echo " Detached from $IFACE" ;;
   status)
     echo "=== TC filters on $IFACE ==="
     tc filter show dev "$IFACE" ingress 2>/dev/null || echo "(none)" ;;
