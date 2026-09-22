@@ -35,7 +35,7 @@ echo " Duration:   ${DURATION}s per trial"
 echo " Repetitions: $REPS"
 echo "========================================================"
 echo ""
-echo "⚠  Start continuous pktgen on xdp-sender NOW:"
+echo "   Start continuous pktgen on xdp-sender NOW:"
 echo "   for i in {1..20}; do sudo bash scripts/pktgen_sender.sh 30000 64 300000 80; done"
 echo ""
 read -p "Press ENTER when pktgen is running..."
@@ -54,14 +54,26 @@ for REP in $(seq 1 $REPS); do
     INSTRUCTIONS=$(echo "$RESULT" | grep "instructions" | grep -oP '^\s+\d+' | grep -oP '\d+' | head -1)
 
     if [ "${RUN_CNT:-0}" -gt 0 ]; then
-        CYCLES_PER_PKT=$(python3 -c "print(f'{int('${CYCLES:-0}')/int('${RUN_CNT}'):.2f}')")
-        INSNS_PER_PKT=$(python3 -c "print(f'{int('${INSTRUCTIONS:-0}')/int('${RUN_CNT}'):.2f}')")
-        IPC=$(python3 -c "print(f'{int('${INSTRUCTIONS:-0}')/max(int('${CYCLES:-1}'),1):.4f}')")
+                CYCLES_PER_PKT=$(python3 -c "
+             run_cnt = int('${RUN_CNT:-0}')
+             cycles  = int('${CYCLES:-0}')
+             print(f'{cycles/run_cnt:.2f}')
+             ")
+                INSNS_PER_PKT=$(python3 -c "
+             run_cnt = int('${RUN_CNT:-0}')
+             insns   = int('${INSTRUCTIONS:-0}')
+             print(f'{insns/run_cnt:.2f}')
+             ")
+                IPC=$(python3 -c "
+             cycles = int('${CYCLES:-1}')
+             insns  = int('${INSTRUCTIONS:-0}')
+             print(f'{insns/max(cycles,1):.4f}')
+             ")
     else
         CYCLES_PER_PKT="N/A"
         INSNS_PER_PKT="N/A"
         IPC="N/A"
-        echo "  ⚠ run_cnt=0 — no traffic during profile window"
+        echo "   run_cnt=0 — no traffic during profile window"
     fi
 
     TIMESTAMP=$(date +%Y%m%d_%H%M%S)
