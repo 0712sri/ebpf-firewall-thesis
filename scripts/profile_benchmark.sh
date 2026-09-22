@@ -10,7 +10,7 @@
 #   sudo bash scripts/profile_benchmark.sh b2 7526 5 15
 #   sudo bash scripts/profile_benchmark.sh b1 7566 5 15
 
-set -euo pipefail
+set -u
 
 CONFIG=${1:-b2}
 PROG_ID=${2}
@@ -24,7 +24,8 @@ if [ ! -f "$RESULTS_FILE" ]; then
 fi
 
 # Get program name
-PROG_NAME=$(sudo $BPFTOOL prog list id $PROG_ID 2>/dev/null | grep -oP 'name \K\S+' || echo "unknown")
+PROG_NAME=$(sudo $BPFTOOL prog show id $PROG_ID 2>/dev/null | awk '{print $4}' || echo "prog_${PROG_ID}")
+
 
 echo "========================================================"
 echo " BPF Profile Benchmark"
