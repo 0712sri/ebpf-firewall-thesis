@@ -55,21 +55,9 @@ for REP in $(seq 1 $REPS); do
     INSTRUCTIONS=$(echo "$RESULT" | grep "instructions" | grep -oP '^\s+\d+' | grep -oP '\d+' | head -1)
 
     if [ "${RUN_CNT:-0}" -gt 0 ]; then
-                CYCLES_PER_PKT=$(python3 -c "
-             run_cnt = int('${RUN_CNT:-0}')
-             cycles  = int('${CYCLES:-0}')
-             print(f'{cycles/run_cnt:.2f}')
-             ")
-                INSNS_PER_PKT=$(python3 -c "
-             run_cnt = int('${RUN_CNT:-0}')
-             insns   = int('${INSTRUCTIONS:-0}')
-             print(f'{insns/run_cnt:.2f}')
-             ")
-                IPC=$(python3 -c "
-             cycles = int('${CYCLES:-1}')
-             insns  = int('${INSTRUCTIONS:-0}')
-             print(f'{insns/max(cycles,1):.4f}')
-             ")
+                CYCLES_PER_PKT=$(python3 -c "print(f'{int('$CYCLES')/int('$RUN_CNT'):.2f}')" 2>/dev/null || python3 -c "print(round($CYCLES/$RUN_CNT, 2))")
+                INSNS_PER_PKT=$(python3 -c "print(round($INSTRUCTIONS/$RUN_CNT, 2))")
+                IPC=$(python3 -c "print(round($INSTRUCTIONS/max($CYCLES,1), 4))")
     else
         CYCLES_PER_PKT="N/A"
         INSNS_PER_PKT="N/A"
