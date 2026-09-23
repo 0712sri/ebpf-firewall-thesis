@@ -37,7 +37,7 @@ echo " Repetitions: $REPS"
 echo "========================================================"
 echo ""
 echo "   Start continuous pktgen on xdp-sender NOW:"
-echo "   for i in {1..20}; do sudo bash scripts/pktgen_sender.sh 30000 64 300000 80; done"
+echo "   for i in {1..20}; do sudo bash scripts/pktgen_sender.sh 30000 64 300000 $MATCH_PORT; done"
 echo ""
 read -p "Press ENTER when pktgen is running..."
 
