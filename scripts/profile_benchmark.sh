@@ -3,19 +3,19 @@
 # Measures BPF program cycles/packet using bpftool prog profile
 # Run on: xdp-firewall
 # Requires: traffic running from xdp-sender during measurement
-#
-# Usage: sudo bash scripts/profile_benchmark.sh <config> <prog_id> <repetitions> <duration>
-#
 # Example:
-#   sudo bash scripts/profile_benchmark.sh b2 7526 5 15
-#   sudo bash scripts/profile_benchmark.sh b1 7566 5 15
+# Usage: sudo bash scripts/profile_benchmark.sh <config> <prog_id> <match_port> <repetitions> <duration>
+#   sudo bash scripts/profile_benchmark.sh b2 7920 80 5 15    (best case)
+#   sudo bash scripts/profile_benchmark.sh b2 7920 9900 5 15  (worst case)
+#   sudo bash scripts/profile_benchmark.sh b1 7811 80 5 15    (best case)
 
 set -u
 
 CONFIG=${1:-b2}
 PROG_ID=${2}
-REPS=${3:-5}
-DURATION=${4:-15}
+MATCH_PORT=${3:-80}
+REPS=${4:-5}
+DURATION=${5:-15}
 BPFTOOL=/tmp/bpftool/src/bpftool
 RESULTS_FILE="bench/profile_results.csv"
 
