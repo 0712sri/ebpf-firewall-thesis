@@ -24,7 +24,7 @@ if [ ! -f "$RESULTS_FILE" ]; then
 fi
 
 # Get program name
-PROG_NAME=$(sudo $BPFTOOL prog show id $PROG_ID 2>/dev/null | awk '{print $4}' || echo "prog_${PROG_ID}")
+PROG_NAME=$(sudo $BPFTOOL prog list id $PROG_ID 2>/dev/null | head -1 | awk '{print $4}' | tr -d '\n' || echo "prog_${PROG_ID}")
 
 
 echo "========================================================"
