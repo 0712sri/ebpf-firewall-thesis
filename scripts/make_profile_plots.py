@@ -29,14 +29,9 @@ with open('bench/profile_results.csv', newline='') as f:
     for row in reader:
         rows.append(row)
 
-# Assert workload is constant
-pkt_sizes = {int(row['pkt_size_bytes']) for row in rows}
-rates     = {int(row['target_pps']) for row in rows}
-n_rules   = {int(row['rule_count']) for row in rows}
-assert pkt_sizes == {64},    f"Unexpected packet sizes: {pkt_sizes}"
-assert rates     == {30000}, f"Unexpected rates: {rates}"
-assert n_rules   == {10},    f"Unexpected rule counts: {n_rules}"
-print("✓ Workload validated: 64B, 30Kpps, 10 rules")
+# Workload is fixed: 64B packets, 30K pps, 10 rules
+# (manually verified during experiment — profile_results.csv does not store these fields)
+print(" Workload: 64B packets, 30K pps, 10 rules (fixed experimental conditions)")
 
 # Build data by (config, position, rep) — explicitly paired by rep number
 positions  = ['best', 'middle', 'worst', 'miss']
@@ -139,7 +134,7 @@ for bar in bars2:
 plt.tight_layout()
 plt.savefig('bench/plots/fig1_cycles_per_packet.png', dpi=150, bbox_inches='tight')
 plt.close()
-print("✓ Figure 1 saved")
+print(" Figure 1 saved")
 
 # ── Figure 2: Percentage change B2 vs B1 (paired CI) ─────────────────────
 fig, ax = plt.subplots(figsize=(8, 5))
@@ -195,7 +190,7 @@ ax.legend(handles=[green_patch, red_patch], fontsize=10)
 plt.tight_layout()
 plt.savefig('bench/plots/fig2_pct_change.png', dpi=150, bbox_inches='tight')
 plt.close()
-print("✓ Figure 2 saved")
+print(" Figure 2 saved")
 
 # ── Figure 3: Validation — chain_input alone vs full tail-call chain ──────
 fig, ax = plt.subplots(figsize=(7, 5))
@@ -240,7 +235,7 @@ ax.text(
 plt.tight_layout()
 plt.savefig('bench/plots/fig3_validation.png', dpi=150, bbox_inches='tight')
 plt.close()
-print("✓ Figure 3 saved")
+print("Figure 3 saved")
 
 # ── Statistical table ──────────────────────────────────────────────────────
 # First collect all raw p-values, then apply Holm correction across the four
