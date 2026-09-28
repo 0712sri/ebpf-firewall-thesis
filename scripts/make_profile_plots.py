@@ -206,7 +206,7 @@ colors_val  = ['#aec7e8', B1_COLOR]
 bars = ax.bar(categories, cycle_vals, color=colors_val, alpha=0.85, width=0.4)
 ax.set_ylabel('Cycles per packet', fontsize=12)
 ax.set_title(
-    'Validation: B1 profiling captures complete tail-call chain\n'
+    'Validation: B1 profiling under tail-call execution\n'
     'cycles/packet, 64B packets, 30K pps',
     fontsize=12
 )
@@ -266,7 +266,7 @@ print(" Statistical Summary — B1 vs B2 cycles/packet (paired t-test, Holm-adju
 print("=" * 112)
 print(
     f"{'Pos':<8} {'B1 mean':>9} {'B1 SD':>7} {'B2 mean':>9} {'B2 SD':>7} "
-    f"{'Diff':>7} {'Diff%':>7} {'95%CI':>18} {'p-val':>8} {'p-Holm':>8} {'sig':>4}"
+    f"{'Diff':>7} {'Diff%':>7} {'95%CI':>18} {'p-val':>8} {'p-Holm':>8} {'d':>7} {'sig':>4}"
 )
 print("-" * 112)
 
@@ -276,6 +276,7 @@ for idx, (p, b1, b2, t_stat, p_val) in enumerate(raw_results):
     b1_s = statistics.stdev(b1)
     b2_s = statistics.stdev(b2)
     diffs  = [b - a for a, b in zip(b1, b2)]
+    cohens_d = statistics.mean(diffs) / statistics.stdev(diffs)
     d_mean = statistics.mean(diffs)
     d_se   = statistics.stdev(diffs) / math.sqrt(len(diffs))
     t_crit = stats.t.ppf(0.975, df=len(diffs) - 1)
@@ -288,7 +289,7 @@ for idx, (p, b1, b2, t_stat, p_val) in enumerate(raw_results):
     print(
         f"{p:<8} {b1_m:>9.1f} {b1_s:>7.1f} {b2_m:>9.1f} {b2_s:>7.1f} "
         f"{d_mean:>+7.1f} {pct:>+6.2f}% [{ci_lo:>+7.1f},{ci_hi:>+6.1f}] "
-        f"{p_val:>8.4f} {p_adj:>8.4f} {sig:>4}"
+        f"{p_val:>8.4f} {p_adj:>8.4f} {cohens_d:>+7.3f} {sig:>4}"
     )
 
 print()
