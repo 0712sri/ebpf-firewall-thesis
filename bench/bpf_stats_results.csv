@@ -1,0 +1,14 @@
+config,match_pos,cluster,n_reps,mean_ns_pkt,sd_ns_pkt,cv_pct,notes
+b2,best,stable,9,88.13,2.50,2.8,rep1 warmup excluded
+b2,middle,stable,9,81.96,1.37,1.7,rep4 outlier excluded
+b2,worst,stable,10,80.46,1.79,2.2,no outliers
+b2,miss,stable,8,119.15,10.26,8.6,higher variance due to map lookup on DROP path
+b1,best,fast,12,131.74,12.51,9.5,bimodal low cluster
+b1,best,slow,8,180.49,8.21,4.5,bimodal high cluster
+b1,middle,fast,8,132.25,12.70,9.6,trimodal low cluster
+b1,middle,mid,9,179.02,7.16,4.0,trimodal mid cluster
+b1,middle,high,3,237.08,9.41,4.0,trimodal high cluster
+b1,worst,fast,12,126.44,9.75,7.7,bimodal low cluster
+b1,worst,slow,8,186.10,18.34,9.9,bimodal high cluster
+b1,miss,fast,15,129.94,8.51,6.5,bimodal low cluster
+b1,miss,slow,5,173.45,7.96,4.6,bimodal high cluster
