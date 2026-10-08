@@ -1,0 +1,25 @@
+COMPLETE B1 vs B2 SUMMARY — bpf_stats_enabled ns/packet
+Method: bpf_stats before/after 300K packets at 30K pps, 64B, 10 rules
+CPU affinity: pktgen pinned to CPU 0 via taskset
+
+Pos        B2 mean   B2 SD  B2 CV |  B1 fast   B1 slow   B1 CV
+----------------------------------------------------------------------
+best         88.13    2.50   2.8% |   131.74    180.49   17.7%
+middle       81.96    1.37   1.7% |   132.25    179.02   22.4%
+worst        80.46    1.79   2.2% |   126.44    186.10   21.8%
+miss        119.15   10.26   8.6% |   129.94    173.45   14.9%
+
+Pos         B1 fast vs B2    B1 slow vs B2
+--------------------------------------------
+best              +49.5%          +104.8%
+middle            +61.4%          +118.4%
+worst             +57.1%          +131.3%
+miss               +9.1%           +45.6%
+
+B2 is stable across all positions (CV 1.7-8.6%).
+B1 shows two distinct execution modes across all positions (CV 14.9-22.4%).
+B1 fast mode is ~9-61% slower than B2.
+B1 slow mode is ~46-131% slower than B2.
+
+Note: CPU affinity pinning did not eliminate the two-mode behaviour.
+Root cause not yet established — interpretation deferred to Discussion.
