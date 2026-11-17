@@ -1,18 +1,23 @@
 // SPDX-License-Identifier: GPL-2.0
-// src/firewall_b1.bpf.c — Config B1: tail-call chain structure
-// SAFETY: Rule 0 always ACCEPTs SSH from bastion (10.8.50.180)
+// src/firewall_b1.bpf.c — Config B1: chain structure preserved with tail calls
+//
+// One BPF program per iptables chain (same chains as config A):
+//   chain_input   = FORWARD      rule 1, then -j FILTER_DROP
+//   chain_forward = FILTER_DROP  rules 2-3, then (return to FORWARD) -j ALLOW
+//   chain_custom  = ALLOW        rules 4-10, then FORWARD policy DROP
+// Program names are unchanged so obj/b1_loader still wires them:
+//   chain_jump_table[1] = chain_forward, [2] = chain_custom
+//
+// FILTER_DROP only drops, and FORWARD has nothing between its two jumps, so
+// "return from FILTER_DROP, then -j ALLOW" is one tail call straight to ALLOW.
+//
+// Rules: src/fw_rules.h. Parser + counters: src/fw_common.h (shared with B2).
+// The packet is parsed once in chain_input and passed on in skb->cb[].
+// If a tail call fails (jump table empty, e.g. b1_loader not running) the
+// packet is DROPPED and counted in fw_stats[2] — the firewall fails closed.
 
-#include <linux/bpf.h>
-#include <linux/pkt_cls.h>
-#include <linux/if_ether.h>
-#include <linux/ip.h>
-#include <linux/tcp.h>
-#include <linux/udp.h>
-#include <linux/in.h>
-#include <bpf/bpf_helpers.h>
-#include <bpf/bpf_endian.h>
-
-#define BASTION_IP 0x0A0832B4U  // 10.8.50.180
+#include "fw_common.h"
+#include "fw_rules.h"
 
 struct {
     __uint(type,        BPF_MAP_TYPE_PROG_ARRAY);
@@ -21,91 +26,46 @@ struct {
     __type(value,       __u32);
 } chain_jump_table SEC(".maps");
 
-struct {
-    __uint(type,        BPF_MAP_TYPE_PERCPU_ARRAY);
-    __uint(max_entries, 4);
-    __type(key,         __u32);
-    __type(value,       __u64);
-} fw_stats SEC(".maps");
+#define JUMP(idx) do {                                    \
+        bpf_tail_call(skb, &chain_jump_table, (idx));     \
+        return verdict(K_TCFAIL, TC_ACT_SHOT);            \
+    } while (0)
 
-static __always_inline void count(__u32 pk, __u32 bk, __u32 len) {
-    __u64 *v; __u32 k = pk;
-    v = bpf_map_lookup_elem(&fw_stats, &k); if (v) __sync_fetch_and_add(v, 1);
-    k = bk;
-    v = bpf_map_lookup_elem(&fw_stats, &k); if (v) __sync_fetch_and_add(v, (__u64)len);
+SEC("tc")
+int chain_input(struct __sk_buff *skb)          // FORWARD
+{
+    struct pkt p;
+    int rc = parse_pkt(skb, &p);
+    if (rc == PARSE_PASS) return TC_ACT_OK;
+    if (rc == PARSE_DROP) DROP();
+    if (LOCAL_DST(p))     return TC_ACT_OK;   // for the firewall itself: INPUT, not FORWARD
+
+    RULES_FORWARD(p)
+
+    store_pkt(skb, &p);
+    JUMP(1);                                    // -j FILTER_DROP
 }
 
-static __always_inline struct iphdr *parse_ip(struct __sk_buff *skb) {
-    void *data = (void *)(long)skb->data, *data_end = (void *)(long)skb->data_end;
-    struct ethhdr *eth = data;
-    if ((void *)(eth + 1) > data_end) return NULL;
-    if (eth->h_proto != bpf_htons(ETH_P_IP)) return NULL;
-    struct iphdr *ip = (void *)(eth + 1);
-    if ((void *)(ip + 1) > data_end) return NULL;
-    return ip;
+SEC("tc")
+int chain_forward(struct __sk_buff *skb)        // FILTER_DROP
+{
+    struct pkt p;
+    load_pkt(skb, &p);
+
+    RULES_FILTER_DROP(p)
+
+    JUMP(2);                                    // back in FORWARD: -j ALLOW
 }
 
-SEC("tc") int chain_input(struct __sk_buff *skb) {
-    struct iphdr *ip = parse_ip(skb); if (!ip) goto accept;
-    __u32 src = bpf_ntohl(ip->saddr);
-    void *data_end = (void *)(long)skb->data_end;
+SEC("tc")
+int chain_custom(struct __sk_buff *skb)         // ALLOW
+{
+    struct pkt p;
+    load_pkt(skb, &p);
 
-    // Rule 0 — SAFETY: always ACCEPT SSH from bastion
-    if (src == BASTION_IP && ip->protocol == IPPROTO_TCP) {
-        struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(tcp + 1) <= data_end && bpf_ntohs(tcp->dest) == 22)
-            goto accept;
-    }
+    RULES_ALLOW(p)
 
-    // Rule 1 — DROP src 192.168.100.0/24
-    if ((src & 0xFFFFFF00U) == 0xC0A86400U) { count(1,3,skb->len); return TC_ACT_SHOT; }
-
-    // Rule 2 — DROP tcp:22 from 10.0.0.0/8
-    if (ip->protocol == IPPROTO_TCP) {
-        struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(tcp+1) <= data_end && bpf_ntohs(tcp->dest)==22 &&
-            (src & 0xFF000000U) == 0x0A000000U)
-            { count(1,3,skb->len); return TC_ACT_SHOT; }
-    }
-
-    bpf_tail_call(skb, &chain_jump_table, 1);
-accept:
-    count(0,2,skb->len); return TC_ACT_OK;
-}
-
-SEC("tc") int chain_forward(struct __sk_buff *skb) {
-    struct iphdr *ip = parse_ip(skb); if (!ip) goto accept;
-    void *data_end = (void *)(long)skb->data_end;
-
-    // Rule 3,4,5 — ACCEPT tcp:80, tcp:443, tcp:5201 both directions
-    if (ip->protocol == IPPROTO_TCP) {
-        struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(tcp+1) <= data_end) {
-            __u16 d = bpf_ntohs(tcp->dest);
-            __u16 s = bpf_ntohs(tcp->source);
-            if (d==80||d==443||d==5201||s==80||s==443||s==5201)
-                { count(0,2,skb->len); return TC_ACT_OK; }
-        }
-    }
-
-    // Rule 6 — ACCEPT udp:53 and udp:5001
-    if (ip->protocol == IPPROTO_UDP) {
-        struct udphdr *udp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(udp+1) <= data_end && (bpf_ntohs(udp->dest)==53 || bpf_ntohs(udp->dest)==5001 ||
-    bpf_ntohs(udp->dest)==80 || bpf_ntohs(udp->dest)==5500 || bpf_ntohs(udp->dest)==9900))
-            { count(0,2,skb->len); return TC_ACT_OK; }
-    }
-
-    // Rule 7 — ACCEPT ICMP
-    if (ip->protocol == IPPROTO_ICMP) { count(0,2,skb->len); return TC_ACT_OK; }
-
-    bpf_tail_call(skb, &chain_jump_table, 2);
-accept:
-    count(0,2,skb->len); return TC_ACT_OK;
-}
-
-SEC("tc") int chain_custom(struct __sk_buff *skb) {
-    count(1,3,skb->len); return TC_ACT_SHOT;
+    DROP();                                     // FORWARD policy DROP (miss)
 }
 
 char _license[] SEC("license") = "GPL";

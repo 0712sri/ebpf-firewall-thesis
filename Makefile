@@ -1,4 +1,4 @@
-CLANG   := clang-18
+CLANG   := clang
 BPFTOOL := bpftool
 ARCH    := $(shell uname -m | sed 's/x86_64/x86/' | sed 's/aarch64/arm64/')
 KERN_HEADERS := /usr/include/$(shell uname -m)-linux-gnu
