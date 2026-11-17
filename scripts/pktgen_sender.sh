@@ -1,44 +1,45 @@
 #!/usr/bin/env bash
-# scripts/pktgen_sender.sh
-# Follows: Turull et al. 2016 pktgen methodology
+# scripts/pktgen_sender.sh — traffic source, runs on apt-kitten (testbed)
+# Sends UDP 10.35.5.203:40000 -> 10.35.4.4:<dst_port> through casual-lamb.
+# pktgen uses the physical test NIC and adds the VLAN tag itself
+# (pktgen on a VLAN interface is unreliable).
 #
 # Usage: sudo bash scripts/pktgen_sender.sh <pps> <pkt_size> <num_packets> <dst_port>
-
 set -euo pipefail
 
 PPS=${1:-10000}
 PKT_SIZE=${2:-64}
 NUM_PKTS=${3:-100000}
-DST_PORT=${4:-5001}
-IFACE=eth1
-DST_IP=192.168.2.2
-DST_MAC=bc:24:11:8e:2c:cb
+DST_PORT=${4:-80}
+
+IFACE=eno2                   # apt-kitten test NIC (100 Mbit)
+VLAN=3155                    # apt-kitten <-> casual-lamb test VLAN
+SRC_IP=10.35.5.203           # apt-kitten
+DST_IP=10.35.4.4             # smooth-gecko (forwarded by casual-lamb)
+DST_MAC=00:22:4d:a8:54:9b    # casual-lamb enp0s25 = next hop
+SRC_PORT=40000               # fixed: must not match rule 6 (53/5001)
 THREAD=kpktgend_0
-DELAY=$(python3 -c "print(int(1000000000 / $PPS))")
+DELAY=$((1000000000 / PPS))
+PG=/proc/net/pktgen
 
-echo "[pktgen] PPS=$PPS  PktSize=${PKT_SIZE}B  NumPkts=$NUM_PKTS  DstPort=$DST_PORT  Delay=${DELAY}ns"
-echo "[pktgen] Start: $(date +%s%N) ns"
+modprobe pktgen
+pg() { echo "$2" > "$PG/$1"; }
 
-sudo modprobe pktgen 2>/dev/null || true
+pg "$THREAD" rem_device_all
+pg "$THREAD" "add_device $IFACE"
+pg "$IFACE" "count $NUM_PKTS"
+pg "$IFACE" "delay $DELAY"
+pg "$IFACE" "pkt_size $PKT_SIZE"
+pg "$IFACE" "vlan_id $VLAN"
+pg "$IFACE" "dst $DST_IP"
+pg "$IFACE" "dst_mac $DST_MAC"
+pg "$IFACE" "src_min $SRC_IP"
+pg "$IFACE" "src_max $SRC_IP"
+pg "$IFACE" "udp_src_min $SRC_PORT"
+pg "$IFACE" "udp_src_max $SRC_PORT"
+pg "$IFACE" "udp_dst_min $DST_PORT"
+pg "$IFACE" "udp_dst_max $DST_PORT"
 
-# Write each parameter separately — avoids quoting issues
-echo rem_device_all          | sudo tee /proc/net/pktgen/$THREAD > /dev/null
-echo "add_device $IFACE"     | sudo tee /proc/net/pktgen/$THREAD > /dev/null
-echo "count $NUM_PKTS"       | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "delay $DELAY"          | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "pkt_size $PKT_SIZE"    | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "dst $DST_IP"           | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "dst_mac $DST_MAC"      | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "src_min 192.168.1.2"   | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "src_max 192.168.1.2"   | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "udp_dst_min $DST_PORT" | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "udp_dst_max $DST_PORT" | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "udp_src_min 1024"      | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-echo "udp_src_max 65535"     | sudo tee /proc/net/pktgen/$IFACE > /dev/null
-
-echo start | sudo tee /proc/net/pktgen/pgctrl > /dev/null
-
-echo "[pktgen] End: $(date +%s%N) ns"
-echo ""
-echo "=== pktgen results ==="
-sudo cat /proc/net/pktgen/$IFACE | grep -E "Result|pps|pkts-sofar|errors|stopped"
+echo "[pktgen] $NUM_PKTS pkts, ${PKT_SIZE}B, $PPS pps -> $DST_IP:$DST_PORT (vlan $VLAN)"
+pg pgctrl start
+grep -E "Result|pkts-sofar|errors" "$PG/$IFACE"
