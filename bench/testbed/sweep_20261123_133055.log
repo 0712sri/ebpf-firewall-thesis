@@ -1,0 +1,16 @@
+[sweep] 16 runs: 1 reps x 16 pairs, 30000 pps, 30000 pkts -> /home/ubuntu/srinika/results/sweep_20261123_133055.csv
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+[pktgen] 30000 pkts, 64B, 30000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 30000  errors: 0
+Result: OK: 1000034(c20745+d979288) usec, 30000 (64byte,0frags)
+  29998pps 15Mb/sec (15358976bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261123_133058,1,a,10,best,80,accept,30000,64,30000,0,1000034,30000,0,0,0,30000,0,0,0,,3.11,0.62,-
+RESULT=OK
+[1/16] rep 1  a best  ok
+[sweep] done: 1/16 ok -> /home/ubuntu/srinika/results/sweep_20261123_133055.csv
