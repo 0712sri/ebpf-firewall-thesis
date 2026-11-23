@@ -1,0 +1,4 @@
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261123_141020,0,b2,10,best,80,accept,30000,64,30000,0,1000010,30000,30000,0,0,0,0,30010,3523698,117.42,4.20,0.80,cpu3:30000
+20261123_152515,0,b2,10,best,80,accept,30000,64,30000,0,1000009,30000,30000,0,0,0,0,30005,3518158,117.25,4.39,0.90,cpu3:30000
+20261123_152730,0,b2,10,best,80,accept,30000,64,30000,0,1000011,30000,30000,0,0,0,0,30006,3482929,116.07,4.30,0.80,cpu3:30000
