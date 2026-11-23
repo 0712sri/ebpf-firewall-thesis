@@ -13,7 +13,8 @@
 # NTAS: select streams 010000010201 + 010000010202 to also get the MP captures.
 
 set -euo pipefail
-cd "$(dirname "$0")/.."
+export HOME=${HOME:-/home/ubuntu}          # NTAS may start us without HOME
+cd "$(dirname "$0")/.."                     # run from the repo root, wherever we are started from
 
 CFG=${1:?config: a|b0|b1|b2}
 POS=${2:?position: best|middle|worst|miss}
