@@ -3,11 +3,12 @@
 #
 # Usage: bash fwexp.sh <a|b0|b1|b2> <best|middle|worst|miss> [pps] [count] [pkt_size]
 #   e.g. bash fwexp.sh b2 best 30000 300000
+#
 #   1. sets up the config on casual-lamb       (fw_setup.sh)
 #   2. reads the counters                      (fw_stats.sh read)
 #   3. sends the traffic from here             (pktgen_sender.sh)
 #   4. reads the counters again, prints ONE CSV line (also appended to results)
-#   5. always cleans up: config off, marker removed — even on error / Ctrl+C
+#   5. always cleans up: config off — even on error / Ctrl+C
 #
 # NTAS: select streams 010000010201 + 010000010202 to also get the MP captures.
 
@@ -23,7 +24,8 @@ RULES=10                                     # rule set in src/fw_rules.h
 
 LAMB=ubuntu@casual-lamb.maasint.cl.bth.se
 REPO=srinika/ebpf-firewall-thesis            # relative to ~ on casual-lamb
-RESULTS=$HOME/srinika/results/fwexp.csv
+RESULTS=${RESULTS:-$HOME/srinika/results/fwexp.csv}   # sweep.sh sets its own file
+REP=${REP:-0}                                # set by sweep.sh
 
 case "$POS" in
     best) PORT=80 ;; middle) PORT=5500 ;; worst) PORT=9900 ;; miss) PORT=9999 ;;
@@ -55,10 +57,14 @@ errs=$(grep -oP 'errors: \K[0-9]+' <<<"$pg" | tail -1 || echo 0)
 usec=$(grep -oP 'Result: OK: \K[0-9]+' <<<"$pg" || echo 0)
 run_cnt=$(delta run_cnt); run_ns=$(delta run_ns)
 ns_pkt=$(awk -v n="$run_ns" -v c="$run_cnt" 'BEGIN{ if (c>0) printf "%.2f", n/c; else print "" }')
+pct() { awk -v a="$1" -v b="$2" 'BEGIN{ if (b>0) printf "%.2f", 100*a/b; else print "" }'; }
+cpu_total=$(delta cpu_total)
+cpu_busy_pct=$(pct "$(delta cpu_busy)" "$cpu_total")      # all CPUs of casual-lamb
+cpu_sirq_pct=$(pct "$(delta cpu_sirq)" "$cpu_total")
 expected=$([ "$POS" = miss ] && [ "$CFG" != b0 ] && echo drop || echo accept)
 
-header="timestamp,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpus"
-line="$(date +%Y%m%d_%H%M%S),$CFG,$RULES,$POS,$PORT,$expected,$PPS,$PKT_SIZE,$sent,$errs,$usec,$(delta fwd),$(delta accept),$(delta drop),$(delta tcfail),$(delta a_accept),$(delta a_drop),$run_cnt,$run_ns,$ns_pkt,$(get cpus "$after")"
+header="timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus"
+line="$(date +%Y%m%d_%H%M%S),$REP,$CFG,$RULES,$POS,$PORT,$expected,$PPS,$PKT_SIZE,$sent,$errs,$usec,$(delta fwd),$(delta accept),$(delta drop),$(delta tcfail),$(delta a_accept),$(delta a_drop),$run_cnt,$run_ns,$ns_pkt,$cpu_busy_pct,$cpu_sirq_pct,$(get cpus "$after")"
 
 mkdir -p "$(dirname "$RESULTS")"
 [ -f "$RESULTS" ] || echo "$header" > "$RESULTS"
@@ -66,4 +72,3 @@ echo "$line" >> "$RESULTS"
 echo "$header"
 echo "$line"
 echo "RESULT=OK"
-

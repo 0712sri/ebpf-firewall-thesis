@@ -11,6 +11,9 @@
 #   a_accept a_drop     iptables counters of config A (0 for B)
 #   fwd               packets that left on the outgoing VLAN to <dst_port>
 #   cpus              which CPU processed the packets, e.g. cpu3:2000
+#   cpu_busy cpu_sirq cpu_total   CPU time of all CPUs from /proc/stat (jiffies):
+#                     busy = user+nice+system+irq+softirq, sirq = softirq
+#                     (packet processing runs in softirq), total = all states
 # fwexp.sh reads it before and after the traffic and takes the difference.
 
 set -euo pipefail
@@ -75,7 +78,8 @@ case "${1:-read}" in
 d=json.load(sys.stdin); d=d if isinstance(d,list) else [d]; print(d[0]["id"] if d else "")' 2>/dev/null || true)
         fwd=0
         [ -n "$CMID" ] && fwd=$(dump_percpu "$CMID" | grep -oP 'k0=\K[0-9]+' || echo 0)
-        echo "run_ns=$run_ns run_cnt=$run_cnt accept=$accept drop=$drop tcfail=$tcfail a_accept=$a_accept a_drop=$a_drop fwd=$fwd cpus=$cpus"
+        read -r cpu_busy cpu_sirq cpu_total < <(awk '/^cpu /{b=$2+$3+$4+$7+$8; print b, $8, b+$5+$6+$9}' /proc/stat)
+        echo "run_ns=$run_ns run_cnt=$run_cnt accept=$accept drop=$drop tcfail=$tcfail a_accept=$a_accept a_drop=$a_drop fwd=$fwd cpus=$cpus cpu_busy=$cpu_busy cpu_sirq=$cpu_sirq cpu_total=$cpu_total"
         ;;
     *)
         echo "Usage: $0 prep <port> | read"; exit 1 ;;
