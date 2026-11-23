@@ -26,7 +26,6 @@ RULES=10                                     # rule set in src/fw_rules.h
 LAMB=ubuntu@casual-lamb.maasint.cl.bth.se
 REPO=srinika/ebpf-firewall-thesis            # relative to ~ on casual-lamb
 RESULTS=$HOME/srinika/results/fwexp.csv
-ME=srinika
 
 case "$POS" in
     best) PORT=80 ;; middle) PORT=5500 ;; worst) PORT=9900 ;; miss) PORT=9999 ;;
@@ -36,24 +35,14 @@ case "$CFG" in a|b0|b1|b2) ;; *) echo "config must be a|b0|b1|b2"; exit 1 ;; esa
 
 lamb() { ssh -o BatchMode=yes "$LAMB" "cd $REPO && $*"; }
 
-# 1. time-sharing with Jenny
-owner=$(ssh -o BatchMode=yes "$LAMB" 'cat ~/RUNNING 2>/dev/null || true')
-if [ -n "$owner" ] && [[ "$owner" != "$ME"* ]]; then
-    echo "casual-lamb is busy: $owner"; echo "RESULT=BUSY"; exit 1
-fi
-ssh -o BatchMode=yes "$LAMB" "echo '$ME fwexp $CFG $POS $(date -Is)' > ~/RUNNING"
-
-cleanup() {
-    lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || true
-    ssh -o BatchMode=yes "$LAMB" 'rm -f ~/RUNNING' || true
-}
+cleanup() { lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
-# 2. config
+# 1. config
 lamb "sudo bash scripts/fw_setup.sh $CFG"
 lamb "sudo bash scripts/fw_stats.sh prep $PORT"
 
-# 3.-5. before / traffic / after
+# 2.-4. before / traffic / after
 before=$(lamb "sudo bash scripts/fw_stats.sh read")
 pg=$(sudo bash scripts/pktgen_sender.sh "$PPS" "$PKT_SIZE" "$COUNT" "$PORT")
 sleep 1                                      # let in-flight packets drain
