@@ -33,7 +33,7 @@ case "$POS" in
 esac
 case "$CFG" in a|b0|b1|b2) ;; *) echo "config must be a|b0|b1|b2"; exit 1 ;; esac
 
-lamb() { ssh -o BatchMode=yes "$LAMB" "cd $REPO && $*"; }
+lamb() { ssh -n -o BatchMode=yes "$LAMB" "cd $REPO && $*"; }   # -n: never read our stdin
 
 cleanup() { lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
