@@ -36,7 +36,7 @@ n=0; ok=0
 for rep in $(seq 1 "$REPS"); do
     while read -r c p; do
         n=$((n + 1))
-        if REP=$rep bash scripts/fwexp.sh "$c" "$p" "$PPS" "$COUNT" >> "$LOG" 2>&1; then
+        if REP=$rep bash scripts/fwexp.sh "$c" "$p" "$PPS" "$COUNT" < /dev/null >> "$LOG" 2>&1; then
             ok=$((ok + 1)); status=ok
         else
             status=FAILED
