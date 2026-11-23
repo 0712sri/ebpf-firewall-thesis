@@ -3,13 +3,11 @@
 #
 # Usage: bash fwexp.sh <a|b0|b1|b2> <best|middle|worst|miss> [pps] [count] [pkt_size]
 #   e.g. bash fwexp.sh b2 best 30000 300000
-#
-#   1. refuses to start if Jenny's marker is on casual-lamb
-#   2. sets up the config on casual-lamb       (fw_setup.sh)
-#   3. reads the counters                      (fw_stats.sh read)
-#   4. sends the traffic from here             (pktgen_sender.sh)
-#   5. reads the counters again, prints ONE CSV line (also appended to results)
-#   6. always cleans up: config off, marker removed — even on error / Ctrl+C
+#   1. sets up the config on casual-lamb       (fw_setup.sh)
+#   2. reads the counters                      (fw_stats.sh read)
+#   3. sends the traffic from here             (pktgen_sender.sh)
+#   4. reads the counters again, prints ONE CSV line (also appended to results)
+#   5. always cleans up: config off, marker removed — even on error / Ctrl+C
 #
 # NTAS: select streams 010000010201 + 010000010202 to also get the MP captures.
 
