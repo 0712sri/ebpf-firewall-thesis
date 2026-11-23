@@ -35,7 +35,7 @@ case "$CFG" in a|b0|b1|b2) ;; *) echo "config must be a|b0|b1|b2"; exit 1 ;; esa
 
 lamb() { ssh -n -o BatchMode=yes "$LAMB" "cd $REPO && $*"; }   # -n: never read our stdin
 
-cleanup() { lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || true; }
+cleanup() { rc=$?; lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || true; [ $rc -eq 0 ] || echo FAILURE; }
 trap cleanup EXIT
 
 # 1. config
@@ -72,3 +72,5 @@ echo "$line" >> "$RESULTS"
 echo "$header"
 echo "$line"
 echo "RESULT=OK"
+echo "SUCCESS"
+
