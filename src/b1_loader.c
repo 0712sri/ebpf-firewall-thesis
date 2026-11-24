@@ -3,7 +3,7 @@
 // Loads firewall_b1.bpf.o, wires tail-call jump table, attaches to TC ingress.
 //
 // Build: gcc -O2 -Wall -o obj/b1_loader src/b1_loader.c -lbpf -lelf -lz
-// Run:   sudo ./obj/b1_loader eth0
+// Run:   sudo ./obj/b1_loader eth0 [obj/n100/firewall_b1.bpf.o]
 // Stop:  sudo ./obj/b1_loader eth0 detach
 
 #include <stdio.h>
@@ -54,7 +54,7 @@ static int tc_detach(int ifindex)
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <iface> [detach]\n", argv[0]);
+        fprintf(stderr, "Usage: %s <iface> [object.bpf.o | detach]\n", argv[0]);
         return 1;
     }
 
@@ -71,7 +71,10 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    struct bpf_object *obj = bpf_object__open("obj/firewall_b1.bpf.o");
+    /* optional 2nd argument: which B1 object (rule set size), e.g. obj/n100/firewall_b1.bpf.o */
+    const char *path = (argc >= 3) ? argv[2] : "obj/firewall_b1.bpf.o";
+    printf("  loading %s\n", path);
+    struct bpf_object *obj = bpf_object__open(path);
     if (libbpf_get_error(obj)) {
         fprintf(stderr, "Failed to open BPF object\n");
         return 1;

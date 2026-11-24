@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # scripts/fw_setup.sh — switch the firewall config on casual-lamb
 #
-# Usage: sudo bash scripts/fw_setup.sh <a|b0|b1|b2|off|status>
+# Usage: sudo bash scripts/fw_setup.sh <a|b0|b1|b2|off|status> [N]
+#   N = rule set size: 10 (default), 100, 1000 (rules/config_a_N.rules, obj/nN/)
 #   a       iptables (config_a_setup.sh), scoped to the test VLAN
-#   b0      eBPF empty baseline   (obj/firewall_b0.bpf.o)
+#   b0      eBPF empty baseline   (obj/nN/firewall_b0.bpf.o)
 #   b1      eBPF tail calls       (obj/b1_loader, runs in the background)
-#   b2      eBPF compressed       (obj/firewall_b2.bpf.o)
+#   b2      eBPF compressed       (obj/nN/firewall_b2.bpf.o)
 #   off     remove everything this script ever adds
 #   status  show what is active
 #
@@ -20,6 +21,8 @@ cd "$(dirname "$0")/.."
 IFACE_IN=enp0s25.3155     # from apt-kitten   (B attaches here, A filters -i here)
 IFACE_OUT=enp0s25.3154    # to smooth-gecko   (egress counter)
 CFG=${1:-status}
+N=${2:-10}                # rule set size (10, 100, 1000)
+OBJ=obj/n$N              # make builds obj/n10, obj/n100, obj/n1000
 
 off() {
     IFACE_IN=$IFACE_IN bash scripts/config_a_setup.sh flush >/dev/null
@@ -45,6 +48,7 @@ status() {
     echo "ingress $IFACE_IN : $(tc filter show dev "$IFACE_IN" ingress 2>/dev/null | grep -oP 'name \K\S+' || echo none)"
     echo "egress $IFACE_OUT : $(tc filter show dev "$IFACE_OUT" egress 2>/dev/null | grep -oP 'name \K\S+' || echo none)"
     echo "bpf_stats     : $(sysctl -n kernel.bpf_stats_enabled)"
+    echo "rule set      : $(iptables -S ALLOW 2>/dev/null | grep -c -- "-A ALLOW" | awk '{print ($1 ? $1+3 " rules (A)" : "-")}')"
 }
 
 case "$CFG" in
@@ -53,18 +57,20 @@ case "$CFG" in
         ;;
     a)
         off
-        IFACE_IN=$IFACE_IN bash scripts/config_a_setup.sh load >/dev/null
+        IFACE_IN=$IFACE_IN bash scripts/config_a_setup.sh load "$N" >/dev/null
         counter_on
         ;;
     b0|b2)
         off
-        bash scripts/tc_attach.sh attach "$IFACE_IN" "obj/firewall_${CFG}.bpf.o" tc >/dev/null
+        [ -f "$OBJ/firewall_${CFG}.bpf.o" ] || { echo "missing $OBJ/firewall_${CFG}.bpf.o (run make)"; exit 1; }
+        bash scripts/tc_attach.sh attach "$IFACE_IN" "$OBJ/firewall_${CFG}.bpf.o" tc >/dev/null
         counter_on
         sysctl -qw kernel.bpf_stats_enabled=1
         ;;
     b1)
         off
-        setsid nohup stdbuf -oL ./obj/b1_loader "$IFACE_IN" < /dev/null > /tmp/b1_loader.log 2>&1 &
+        [ -f "$OBJ/firewall_b1.bpf.o" ] || { echo "missing $OBJ/firewall_b1.bpf.o (run make)"; exit 1; }
+        setsid nohup stdbuf -oL ./obj/b1_loader "$IFACE_IN" "$OBJ/firewall_b1.bpf.o" < /dev/null > /tmp/b1_loader.log 2>&1 &
         for _ in $(seq 1 20); do       # wait until chain_input is attached (max 5 s)
             tc filter show dev "$IFACE_IN" ingress 2>/dev/null | grep -q chain_input && break
             sleep 0.25

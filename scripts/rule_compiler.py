@@ -1,257 +1,194 @@
 #!/usr/bin/env python3
 """
-scripts/rule_compiler.py — RQ3: Auto-translate iptables rules to BPF C
-Usage:
-    sudo iptables-save | python3 scripts/rule_compiler.py
-    python3 scripts/rule_compiler.py < rules.txt
-Output:
-    src/firewall_generated.bpf.c
+scripts/rule_compiler.py — RQ3 translator: iptables rules -> TC eBPF rules (C).
+
+Usage:  python3 scripts/rule_compiler.py rules/config_a_100.rules  ->  src/rules/fw_rules_100.h
+        python3 scripts/rule_compiler.py IN.rules OUT.h
+
+Input : an iptables-save / iptables-restore file (filter table) with the chain
+        structure used in this thesis:
+          FW_FORWARD : [rules ...] -j FILTER_DROP, -j ALLOW, -j DROP
+          FILTER_DROP: terminal rules (ACCEPT / DROP)
+          ALLOW      : terminal rules (ACCEPT / DROP)
+Output: a C header defining RULES_FORWARD(p), RULES_FILTER_DROP(p) and
+        RULES_ALLOW(p), used unchanged by B0/B1/B2 (src/fw_rules.h includes it).
+        B1 runs the three macros in three tail-called programs, B2 in one program.
+
+Supported (stateless) matches: -s / -d [!] CIDR, -p tcp|udp|icmp,
+  --dport / --sport N or N:M, -m multiport --dports / --sports / --ports LIST,
+  -m tcp / -m udp / -m multiport / -m comment.  Targets: ACCEPT, DROP.
+Anything else (conntrack, state, limit, REJECT, LOG, -i/-o, ...) is REFUSED
+with the line number: the translator never silently changes a rule's meaning.
 """
-
+import ipaddress
+import shlex
 import sys
-import re
 
-# ── Parse iptables-save format ────────────────────────────────────────────────
-
-def parse_rules(lines):
-    rules = []
-    default_policy = "ACCEPT"
-
-    for line in lines:
-        line = line.strip()
-        if not line or line.startswith('#') or line.startswith('*') or line == 'COMMIT':
-            continue
-        if line.startswith(':FORWARD'):
-            parts = line.split()
-            default_policy = parts[1]
-            continue
-        if not line.startswith('-A FORWARD'):
-            continue
-
-        rule = {}
-
-        # conntrack
-        if '--ctstate' in line:
-            states = re.search(r'--ctstate (\S+)', line)
-            if states:
-                rule['type'] = 'conntrack'
-                rule['states'] = states.group(1).split(',')
-            verdict = re.search(r'-j (\w+)', line)
-            rule['verdict'] = verdict.group(1) if verdict else 'DROP'
-            rules.append(rule)
-            continue
-
-        # protocol
-        proto_m = re.search(r'-p (\w+)', line)
-        rule['proto'] = proto_m.group(1) if proto_m else None
-
-        # destination IP
-        dst_m = re.search(r'-d ([\d./]+)', line)
-        rule['dst'] = dst_m.group(1) if dst_m else None
-
-        # source IP
-        src_m = re.search(r'-s ([\d./]+)', line)
-        rule['src'] = src_m.group(1) if src_m else None
-
-        # destination port
-        dport_m = re.search(r'--dport (\d+)', line)
-        rule['dport'] = int(dport_m.group(1)) if dport_m else None
-
-        # source port
-        sport_m = re.search(r'--sport (\d+)', line)
-        rule['sport'] = int(sport_m.group(1)) if sport_m else None
-
-        # verdict
-        verdict_m = re.search(r'-j (\w+)', line)
-        rule['verdict'] = verdict_m.group(1) if verdict_m else 'DROP'
-
-        rule['type'] = 'filter'
-        rules.append(rule)
-
-    return rules, default_policy
+PROTO = {"tcp": "IS_TCP(p)", "udp": "IS_UDP(p)", "icmp": "IS_ICMP(p)"}
+CHAINS = ("FW_FORWARD", "FILTER_DROP", "ALLOW")
 
 
-def cidr_to_mask(cidr):
-    """Convert CIDR notation to C bitmask expression."""
-    if '/' not in cidr:
-        ip = cidr
-        bits = 32
+class Refused(Exception):
+    pass
+
+
+def ports(spec):
+    """'80' | '1000:2000' | '80,443,6000:6010' -> [(lo, hi), ...]"""
+    out = []
+    for part in spec.split(","):
+        lo, _, hi = part.partition(":")
+        lo = int(lo) if lo else 0
+        hi = int(hi) if hi else (65535 if _ else lo)
+        if not (0 <= lo <= hi <= 65535):
+            raise Refused(f"bad port {part}")
+        out.append((lo, hi))
+    return out
+
+
+def port_expr(field, rng):
+    lo, hi = rng
+    if lo == hi:
+        if field == "dport":
+            return f"DPORT(p, {lo})"
+        if field == "any":
+            return f"ANYPORT(p, {lo})"
+        return f"((p).has_l4 && (p).sport == {lo})"
+    if field == "any":
+        return f"({port_expr('dport', rng)} || {port_expr('sport', rng)})"
+    return f"((p).has_l4 && (p).{field} >= {lo} && (p).{field} <= {hi})"
+
+
+def ports_cond(field, ranges):
+    terms = [port_expr(field, r) for r in ranges]
+    return terms[0] if len(terms) == 1 else "(" + " || ".join(terms) + ")"
+
+
+def addr_cond(field, cidr, neg):
+    net = ipaddress.ip_network(cidr, strict=False)
+    if net.prefixlen == 32:
+        c = f"(p).{field} == 0x{int(net.network_address):08X}U"
+    elif net.prefixlen == 0:
+        c = "1"
+    elif field == "src":
+        c = f"SRC_NET(p, 0x{int(net.network_address):08X}U, 0x{int(net.netmask):08X}U)"
     else:
-        ip, bits = cidr.split('/')
-        bits = int(bits)
-
-    # Convert IP to hex
-    parts = ip.split('.')
-    ip_int = 0
-    for p in parts:
-        ip_int = (ip_int << 8) | int(p)
-
-    mask = (0xFFFFFFFF << (32 - bits)) & 0xFFFFFFFF
-    network = ip_int & mask
-
-    return f"0x{network:08X}U", f"0x{mask:08X}U"
+        c = f"(((p).dst & 0x{int(net.netmask):08X}U) == 0x{int(net.network_address):08X}U)"
+    return f"!({c})" if neg else c
 
 
-def proto_to_c(proto):
-    mapping = {
-        'tcp':  'IPPROTO_TCP',
-        'udp':  'IPPROTO_UDP',
-        'icmp': 'IPPROTO_ICMP',
-    }
-    return mapping.get(proto.lower(), proto.upper())
-
-
-def verdict_to_c(verdict):
-    mapping = {
-        'ACCEPT': ('count(0); return TC_ACT_OK;', 'goto accept;'),
-        'DROP':   ('count(1); return TC_ACT_SHOT;', 'goto drop;'),
-    }
-    return mapping.get(verdict, ('count(1); return TC_ACT_SHOT;', 'goto drop;'))
-
-
-def generate_rule_c(rule, idx):
-    """Generate C code for one iptables rule."""
-    lines = []
-    conditions = []
-    verdict_inline, verdict_goto = verdict_to_c(rule['verdict'])
-
-    # conntrack rule — skip (stateless scope)
-    if rule.get('type') == 'conntrack':
-        lines.append(f"    // Rule {idx}: conntrack {rule.get('states')} — skipped (stateless scope)")
-        return '\n'.join(lines)
-
-    # Build conditions
-    if rule.get('proto') and rule['proto'] != 'all':
-        conditions.append(f"proto == {proto_to_c(rule['proto'])}")
-
-    if rule.get('src'):
-        net, mask = cidr_to_mask(rule['src'])
-        if mask == '0xFFFFFFFFU':
-            conditions.append(f"src == {net}")
+def translate_rule(args):
+    """args after '-A CHAIN' -> (condition, target)"""
+    proto = None
+    terms_in_order = []        # matches keep the order they are written in (protocol goes first)
+    target = None
+    neg = False
+    i = 0
+    while i < len(args):
+        a = args[i]
+        if a == "!":
+            neg = True; i += 1; continue
+        val = args[i + 1] if i + 1 < len(args) else None
+        if a in ("-p", "--protocol"):
+            if neg or val not in PROTO:
+                raise Refused(f"protocol {'! ' if neg else ''}{val}")
+            proto = val
+        elif a in ("-s", "--source"):
+            terms_in_order.append(addr_cond("src", val, neg))
+        elif a in ("-d", "--destination"):
+            terms_in_order.append(addr_cond("dst", val, neg))
+        elif a in ("-m", "--match"):
+            if val not in ("tcp", "udp", "multiport", "comment"):
+                raise Refused(f"-m {val}")
+        elif a == "--comment":
+            pass
+        elif a in ("--dport", "--destination-port", "--dports", "--destination-ports"):
+            if neg: raise Refused(f"! {a}")
+            terms_in_order.append(ports_cond("dport", ports(val)))
+        elif a in ("--sport", "--source-port", "--sports", "--source-ports"):
+            if neg: raise Refused(f"! {a}")
+            terms_in_order.append(ports_cond("sport", ports(val)))
+        elif a == "--ports":
+            if neg: raise Refused(f"! {a}")
+            terms_in_order.append(ports_cond("any", ports(val)))
+        elif a in ("-j", "--jump"):
+            target = val
         else:
-            conditions.append(f"(src & {mask}) == {net}")
-
-    if rule.get('dst'):
-        net, mask = cidr_to_mask(rule['dst'])
-        if mask == '0xFFFFFFFFU':
-            conditions.append(f"dst == {net}")
-        else:
-            conditions.append(f"(dst & {mask}) == {net}")
-
-    if rule.get('dport'):
-        conditions.append(f"dport == {rule['dport']}")
-
-    if rule.get('sport'):
-        conditions.append(f"sport == {rule['sport']}")
-
-    # Generate C
-    lines.append(f"    // Rule {idx}: {rule}")
-    if conditions:
-        cond_str = ' && '.join(conditions)
-        lines.append(f"    if ({cond_str}) {{ {verdict_inline} }}")
-    else:
-        lines.append(f"    {verdict_inline}  // unconditional")
-
-    return '\n'.join(lines)
+            raise Refused(f"option {a}")
+        neg = False
+        i += 2
+    if any("port" in t.lower() for t in terms_in_order) and proto not in ("tcp", "udp"):
+        raise Refused("port match without -p tcp/udp")
+    terms = ([PROTO[proto]] if proto else []) + terms_in_order
+    terms = [t for t in terms if t != "1"]
+    return (" && ".join(terms) if terms else "1"), target
 
 
-def generate_bpf_c(rules, default_policy):
-    """Generate complete BPF C program."""
+def compile_file(text):
+    chains = {c: [] for c in CHAINS}
+    table = None
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if not line or line.startswith("#") or line == "COMMIT":
+            continue
+        if line.startswith("*"):
+            table = line[1:]; continue
+        if line.startswith(":"):
+            continue
+        toks = shlex.split(line)
+        if table != "filter" or toks[0] != "-A" or toks[1] not in chains:
+            raise SystemExit(f"line {lineno}: not part of the supported structure: {line}")
+        try:
+            cond, target = translate_rule(toks[2:])
+        except Refused as e:
+            raise SystemExit(f"line {lineno}: cannot translate exactly ({e}): {line}")
+        chains[toks[1]].append((cond, target, lineno, line))
 
-    rule_code = []
-    for i, rule in enumerate(rules):
-        rule_code.append(generate_rule_c(rule, i + 1))
+    fwd = chains["FW_FORWARD"]
+    tail = [(c, t) for c, t, _, _ in fwd[-3:]]
+    if tail != [("1", "FILTER_DROP"), ("1", "ALLOW"), ("1", "DROP")]:
+        raise SystemExit("FW_FORWARD must end with: -j FILTER_DROP, -j ALLOW, -j DROP")
+    out = {"FW_FORWARD": fwd[:-3], "FILTER_DROP": chains["FILTER_DROP"], "ALLOW": chains["ALLOW"]}
+    for name, rules in out.items():
+        for cond, target, lineno, line in rules:
+            if target not in ("ACCEPT", "DROP"):
+                raise SystemExit(f"line {lineno}: only ACCEPT/DROP allowed here: {line}")
+    return out
 
-    default_action = "TC_ACT_OK" if default_policy == "ACCEPT" else "TC_ACT_SHOT"
-    default_count = "count(0)" if default_policy == "ACCEPT" else "count(1)"
 
-    return f'''// SPDX-License-Identifier: GPL-2.0
-// AUTO-GENERATED by scripts/rule_compiler.py — DO NOT EDIT MANUALLY
-// Source: iptables-save FORWARD chain
-// Generated for: xdp-firewall gateway (ens19 ingress)
-
-#include <linux/bpf.h>
-#include <linux/pkt_cls.h>
-#include <linux/if_ether.h>
-#include <linux/ip.h>
-#include <linux/tcp.h>
-#include <linux/udp.h>
-#include <linux/in.h>
-#include <bpf/bpf_helpers.h>
-#include <bpf/bpf_endian.h>
-
-struct {{
-    __uint(type,        BPF_MAP_TYPE_PERCPU_ARRAY);
-    __uint(max_entries, 2);
-    __type(key,         __u32);
-    __type(value,       __u64);
-}} fw_stats SEC(".maps");
-
-static __always_inline void count(__u32 dropped) {{
-    __u64 *v = bpf_map_lookup_elem(&fw_stats, &dropped);
-    if (v) __sync_fetch_and_add(v, 1);
-}}
-
-SEC("tc")
-int firewall_generated(struct __sk_buff *skb)
-{{
-    void *data     = (void *)(long)skb->data;
-    void *data_end = (void *)(long)skb->data_end;
-
-    struct ethhdr *eth = data;
-    if ((void *)(eth + 1) > data_end) return TC_ACT_OK;
-    if (eth->h_proto != bpf_htons(ETH_P_IP)) return TC_ACT_OK;
-
-    struct iphdr *ip = (void *)(eth + 1);
-    if ((void *)(ip + 1) > data_end) return TC_ACT_OK;
-
-    __u32 src   = bpf_ntohl(ip->saddr);
-    __u32 dst   = bpf_ntohl(ip->daddr);
-    __u8  proto = ip->protocol;
-    __u16 dport = 0;
-    __u16 sport = 0;
-
-    if (proto == IPPROTO_TCP) {{
-        struct tcphdr *tcp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(tcp + 1) > data_end) return TC_ACT_OK;
-        dport = bpf_ntohs(tcp->dest);
-        sport = bpf_ntohs(tcp->source);
-    }} else if (proto == IPPROTO_UDP) {{
-        struct udphdr *udp = (void *)ip + (ip->ihl * 4);
-        if ((void *)(udp + 1) > data_end) return TC_ACT_OK;
-        dport = bpf_ntohs(udp->dest);
-        sport = bpf_ntohs(udp->source);
-    }}
-
-    // ── Generated rules ───────────────────────────────────────────────────────
-{chr(10).join(rule_code)}
-
-    // Default policy: {default_policy}
-    {default_count}; return {default_action};
-}}
-
-char _license[] SEC("license") = "GPL";
-'''
+def macro(name, rules, first_no):
+    lines = [f"#define {name}(p)" + " " * max(1, 66 - len(name)) + "\\"]
+    for k, (cond, target, _, line) in enumerate(rules):
+        act = "ACCEPT();" if target == "ACCEPT" else "DROP();"
+        stmt = act if cond == "1" else f"if ({cond}) {act}"
+        lines.append(f"    /* {first_no + k} */ {stmt}" + " \\")
+    lines.append("    /* end */")
+    return "\n".join(lines)
 
 
 def main():
-    lines = sys.stdin.readlines()
-    rules, default_policy = parse_rules(lines)
+    if len(sys.argv) < 2:
+        print(__doc__); sys.exit(1)
+    src = sys.argv[1]
+    n_tag = src.rsplit("_", 1)[-1].split(".")[0]
+    dst = sys.argv[2] if len(sys.argv) > 2 else f"src/rules/fw_rules_{n_tag}.h"
+    with open(src) as f:
+        ch = compile_file(f.read())
+    n1, n2 = len(ch["FW_FORWARD"]), len(ch["FILTER_DROP"])
+    total = n1 + n2 + len(ch["ALLOW"])
+    guard = "FW_RULES_GEN_" + "".join(c if c.isalnum() else "_" for c in n_tag).upper()
+    text = "\n".join([
+        "// SPDX-License-Identifier: GPL-2.0",
+        f"// {dst} — GENERATED by scripts/rule_compiler.py from {src}. Do not edit.",
+        f"// {total} rules: FW_FORWARD {n1}, FILTER_DROP {n2}, ALLOW {len(ch['ALLOW'])}.",
+        f"#ifndef {guard}", f"#define {guard}", "",
+        macro("RULES_FORWARD", ch["FW_FORWARD"], 1), "",
+        macro("RULES_FILTER_DROP", ch["FILTER_DROP"], 1 + n1), "",
+        macro("RULES_ALLOW", ch["ALLOW"], 1 + n1 + n2), "",
+        f"#endif // {guard}", ""])
+    with open(dst, "w") as f:
+        f.write(text)
+    print(f"{src} -> {dst}: {total} rules translated")
 
-    print(f"// Parsed {len(rules)} rules, default policy: {default_policy}",
-          file=sys.stderr)
-    for i, r in enumerate(rules):
-        print(f"//   Rule {i+1}: {r}", file=sys.stderr)
 
-    code = generate_bpf_c(rules, default_policy)
-
-    outfile = 'src/firewall_generated.bpf.c'
-    with open(outfile, 'w') as f:
-        f.write(code)
-
-    print(f" Written: {outfile}", file=sys.stderr)
-    print(code)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # scripts/fwexp.sh — ONE experiment run. Runs on apt-kitten (NTAS command).
 #
-# Usage: bash fwexp.sh <a|b0|b1|b2> <best|middle|worst|miss> [pps] [count] [pkt_size]
+# Usage: bash fwexp.sh <a|b0|b1|b2> <best|middle|worst|miss> [pps] [count] [pkt_size] [rules]
 #   e.g. bash fwexp.sh b2 best 30000 300000
 #
 #   1. sets up the config on casual-lamb       (fw_setup.sh)
@@ -21,7 +21,7 @@ POS=${2:?position: best|middle|worst|miss}
 PPS=${3:-30000}
 COUNT=${4:-300000}
 PKT_SIZE=${5:-64}
-RULES=10                                     # rule set in src/fw_rules.h
+RULES=${6:-10}                               # rule set size: 10, 100, 1000
 
 LAMB=ubuntu@casual-lamb.maasint.cl.bth.se
 REPO=srinika/ebpf-firewall-thesis            # relative to ~ on casual-lamb
@@ -40,7 +40,7 @@ cleanup() { rc=$?; lamb "sudo bash scripts/fw_setup.sh off" >/dev/null 2>&1 || t
 trap cleanup EXIT
 
 # 1. config
-lamb "sudo bash scripts/fw_setup.sh $CFG"
+lamb "sudo bash scripts/fw_setup.sh $CFG $RULES"
 lamb "sudo bash scripts/fw_stats.sh prep $PORT"
 
 # 2.-4. before / traffic / after

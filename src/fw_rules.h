@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// src/fw_rules.h — THE rule set (v1, 10 rules). Used by B1 and B2.
+// src/fw_rules.h — testbed constants + THE rule set (generated, see below). Used by B0/B1/B2.
 // Must stay identical to scripts/config_a_setup.sh (config A).
 // Scope: traffic arriving on casual-lamb's test VLAN from apt-kitten
 // (enp0s25.3155). A filters exactly that (-i enp0s25.3155), B attaches there.
@@ -39,27 +39,12 @@
                       (p).dst == 0xFFFFFFFFU /* 255.255.255.255 */ ||       \
                       ((p).dst & 0xF0000000U) == 0xE0000000U /* 224/4 */)
 
-// FORWARD, before the jumps
-#define RULES_FORWARD(p)                                                      \
-    /* 1 */ if (IS_TCP(p) && (p).src == BASTION_IP && DPORT(p, 22)) ACCEPT();
-
-// chain FILTER_DROP
-#define RULES_FILTER_DROP(p)                                                  \
-    /* 2 */ if (SRC_NET(p, 0xC0A86400U, 0xFFFFFF00U)) DROP();                 \
-    /* 3 */ if (IS_TCP(p) && DPORT(p, 22) &&                                  \
-                SRC_NET(p, 0x0A000000U, 0xFF000000U)) DROP();
-
-// chain ALLOW
-#define RULES_ALLOW(p)                                                        \
-    /* 4  BEST   */ if (IS_UDP(p) && DPORT(p, 80)) ACCEPT();                  \
-    /* 5         */ if (IS_TCP(p) && (ANYPORT(p, 80) || ANYPORT(p, 443) ||    \
-                                      ANYPORT(p, 5201))) ACCEPT();            \
-    /* 6         */ if (IS_UDP(p) && (ANYPORT(p, 53) || ANYPORT(p, 5001)))    \
-                        ACCEPT();                                             \
-    /* 7  MIDDLE */ if (IS_UDP(p) && DPORT(p, 5500)) ACCEPT();                \
-    /* 8         */ if (IS_ICMP(p)) ACCEPT();                                 \
-    /* 9         */ if (IS_UDP(p) && DPORT(p, 5201)) ACCEPT();                \
-    /* 10 WORST  */ if (IS_UDP(p) && DPORT(p, 9900)) ACCEPT();
+// The rules themselves are GENERATED: rules/config_a_N.rules (iptables, config A)
+// -> scripts/rule_compiler.py -> src/rules/fw_rules_N.h (RULES_FORWARD,
+// RULES_FILTER_DROP, RULES_ALLOW). The Makefile picks N with -DFW_RULES_FILE.
+#ifndef FW_RULES_FILE
+#define FW_RULES_FILE "rules/fw_rules_10.h"
+#endif
+#include FW_RULES_FILE
 
 #endif // FW_RULES_H
-
