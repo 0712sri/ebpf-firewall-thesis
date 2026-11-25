@@ -1,0 +1,179 @@
+hwinfo apt-kitten  2026-11-25T16:44:35+00:00  test NIC: eno2
+
+=== OS / kernel ===
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+Linux apt-kitten 7.0.0-43-generic #43-Ubuntu SMP PREEMPT_DYNAMIC Fri Oct 23 13:25:25 UTC 2026 x86_64 GNU/Linux
+
+=== CPU ===
+CPU(s):                                  8
+Model name:                              AMD Opteron(tm) Processor 4386
+Thread(s) per core:                      1
+Core(s) per socket:                      8
+Socket(s):                               1
+L1d cache:                               128 KiB (8 instances)
+L2 cache:                                8 MiB (4 instances)
+L3 cache:                                8 MiB (1 instance)
+NUMA node(s):                            1
+
+=== CPU frequency ===
+
+=== Memory ===
+MemTotal:       32835696 kB
+
+=== NIC eno2 ===
+$ ip -d link show eno2
+3: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 2c:60:0c:60:28:b6 brd ff:ff:ff:ff:ff:ff promiscuity 1 allmulti 0 minmtu 46 maxmtu 9000 addrgenmode eui64 numtxqueues 8 numrxqueues 8 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 gso_ipv4_max_size 65536 gro_ipv4_max_size 65536 parentbus pci parentdev 0000:01:00.1 
+    altname enp1s0f1
+    altname enx2c600c6028b6
+$ sudo ethtool eno2
+Settings for eno2:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Supported pause frame use: No
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Advertised pause frame use: No
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Speed: 100Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 1
+	Transceiver: internal
+	MDI-X: off
+	Supports Wake-on: g
+	Wake-on: d
+	Link detected: yes
+$ sudo ethtool -i eno2
+driver: bnx2
+version: 7.0.0-43-generic
+firmware-version: 7.4.8 bc 7.4.0 NCSI 2.0.11
+expansion-rom-version: 
+bus-info: 0000:01:00.1
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: no
+
+=== Offloads eno2 ===
+rx-checksumming: on
+tx-checksumming: on
+scatter-gather: on
+	tx-scatter-gather: on
+	tx-scatter-gather-fraglist: off [fixed]
+tcp-segmentation-offload: on
+	tx-tcp-segmentation: on
+	tx-tcp-ecn-segmentation: on
+	tx-tcp-mangleid-segmentation: off
+	tx-tcp6-segmentation: on
+	tx-tcp-accecn-segmentation: off [fixed]
+generic-segmentation-offload: on
+generic-receive-offload: on
+large-receive-offload: off [fixed]
+rx-vlan-offload: on [fixed]
+tx-vlan-offload: on
+rx-vlan-filter: off [fixed]
+tx-fcoe-segmentation: off [fixed]
+tx-gre-segmentation: off [fixed]
+tx-gre-csum-segmentation: off [fixed]
+tx-ipxip4-segmentation: off [fixed]
+tx-ipxip6-segmentation: off [fixed]
+tx-udp_tnl-segmentation: off [fixed]
+tx-udp_tnl-csum-segmentation: off [fixed]
+tx-tunnel-remcsum-segmentation: off [fixed]
+tx-sctp-segmentation: off [fixed]
+tx-esp-segmentation: off [fixed]
+tx-udp-segmentation: off [fixed]
+tx-vlan-stag-hw-insert: off [fixed]
+rx-vlan-stag-hw-parse: off [fixed]
+rx-vlan-stag-filter: off [fixed]
+
+=== Ring / channels eno2 ===
+$ sudo ethtool -g eno2
+Ring parameters for eno2:
+Pre-set maximums:
+RX:			2040
+RX Mini:		n/a
+RX Jumbo:		8160
+TX:			255
+TX push buff len:	n/a
+HDS thresh:		n/a
+Current hardware settings:
+RX:			255
+RX Mini:		n/a
+RX Jumbo:		0
+TX:			255
+RX Buf Len:		n/a
+CQE Size:		n/a
+TX Push:		off
+RX Push:		off
+TX push buff len:	n/a
+TCP data split:		n/a
+HDS thresh:		n/a
+$ sudo ethtool -l eno2
+Channel parameters for eno2:
+Pre-set maximums:
+RX:		8
+TX:		8
+Other:		n/a
+Combined:	n/a
+Current hardware settings:
+RX:		5
+TX:		4
+Other:		n/a
+Combined:	n/a
+
+=== PCI NIC ===
+01:00.0 Ethernet controller: Broadcom Inc. and subsidiaries NetXtreme II BCM5716 Gigabit Ethernet (rev 20)
+01:00.1 Ethernet controller: Broadcom Inc. and subsidiaries NetXtreme II BCM5716 Gigabit Ethernet (rev 20)
+
+=== VLAN interfaces ===
+eno2.3155@eno2   UP             2c:60:0c:60:28:b6 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+eno2.2184@eno2   UP             2c:60:0c:60:28:b6 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+
+=== IRQs of eno2 and their CPU affinity ===
+IRQ 34 -> CPUs 0-7   (eno2-0)
+IRQ 35 -> CPUs 0-7   (eno2-1)
+IRQ 36 -> CPUs 0-7   (eno2-2)
+IRQ 37 -> CPUs 0-7   (eno2-3)
+IRQ 38 -> CPUs 0-7   (eno2-4)
+irqbalance: inactive
+RPS: rx-0=00 rx-1=00 rx-2=00 rx-3=00 rx-4=00 
+
+=== TC qdiscs ===
+$ sudo tc qdisc show
+qdisc noqueue 0: dev lo root refcnt 2 
+qdisc mq 0: dev eno1 root 
+qdisc pfifo_fast 0: dev eno1 parent :4 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno1 parent :3 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno1 parent :2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno1 parent :1 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc mq 0: dev eno2 root 
+qdisc pfifo_fast 0: dev eno2 parent :4 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno2 parent :3 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno2 parent :2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev eno2 parent :1 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc noqueue 0: dev eno2.3155 root refcnt 2 
+qdisc noqueue 0: dev eno2.2184 root refcnt 2 
+qdisc noqueue 0: dev docker0 root refcnt 2 
+
+=== Tools ===
+iptables v1.8.11 (nf_tables)
+bpftool v7.7.0
+using libbpf v1.7
+
+=== Sysctl ===
+net.ipv4.ip_forward = 1
+kernel.bpf_stats_enabled = 0
+net.core.bpf_jit_enable = 1
+
+=== Docker ===
+docker: active, running containers: 0
