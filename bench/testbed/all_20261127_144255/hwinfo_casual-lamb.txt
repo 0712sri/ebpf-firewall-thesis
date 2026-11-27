@@ -1,0 +1,172 @@
+hwinfo casual-lamb  2026-11-27T14:42:57+00:00  test NIC: enp0s25
+
+=== OS / kernel ===
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+Linux casual-lamb 7.0.0-43-generic #43-Ubuntu SMP PREEMPT_DYNAMIC Fri Oct 23 13:25:25 UTC 2026 x86_64 GNU/Linux
+
+=== CPU ===
+CPU(s):                                  4
+Model name:                              Intel(R) Xeon(R) CPU E3-1220 V2 @ 3.10GHz
+Thread(s) per core:                      1
+Core(s) per socket:                      4
+Socket(s):                               1
+CPU(s) scaling MHz:                      93%
+CPU max MHz:                             3500.0000
+CPU min MHz:                             1600.0000
+L1d cache:                               128 KiB (4 instances)
+L2 cache:                                1 MiB (4 instances)
+L3 cache:                                8 MiB (1 instance)
+NUMA node(s):                            1
+
+=== CPU frequency ===
+cpu0 governor=schedutil cur_kHz=1802783
+cpu1 governor=schedutil cur_kHz=3294528
+cpu2 governor=schedutil cur_kHz=2993332
+cpu3 governor=schedutil cur_kHz=3092871
+
+=== Memory ===
+MemTotal:        8094264 kB
+
+=== NIC enp0s25 ===
+$ ip -d link show enp0s25
+2: enp0s25: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
+    link/ether 00:22:4d:a8:54:9b brd ff:ff:ff:ff:ff:ff promiscuity 2 allmulti 0 minmtu 68 maxmtu 9000 addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 gso_ipv4_max_size 65536 gro_ipv4_max_size 65536 parentbus pci parentdev 0000:00:19.0 
+    altname enx00224da8549b
+$ sudo ethtool enp0s25
+Settings for enp0s25:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Supported pause frame use: Symmetric Receive-only
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Advertised pause frame use: Symmetric Receive-only
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Link partner advertised link modes:  100baseT/Half 100baseT/Full
+	Link partner advertised pause frame use: No
+	Link partner advertised auto-negotiation: Yes
+	Link partner advertised FEC modes: Not reported
+	Speed: 100Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 1
+	Transceiver: internal
+	MDI-X: off (auto)
+	Supports Wake-on: pumbg
+	Wake-on: d
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: yes
+$ sudo ethtool -i enp0s25
+driver: e1000e
+version: 7.0.0-43-generic
+firmware-version: 0.13-4
+expansion-rom-version: 
+bus-info: 0000:00:19.0
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+
+=== Offloads enp0s25 ===
+rx-checksumming: on
+tx-checksumming: on
+scatter-gather: on
+	tx-scatter-gather: on
+	tx-scatter-gather-fraglist: off [fixed]
+tcp-segmentation-offload: on
+	tx-tcp-segmentation: on
+	tx-tcp-ecn-segmentation: off [fixed]
+	tx-tcp-mangleid-segmentation: off
+	tx-tcp6-segmentation: on
+	tx-tcp-accecn-segmentation: off [fixed]
+generic-segmentation-offload: on
+generic-receive-offload: on
+large-receive-offload: off [fixed]
+rx-vlan-offload: on
+tx-vlan-offload: on
+rx-vlan-filter: off [fixed]
+tx-fcoe-segmentation: off [fixed]
+tx-gre-segmentation: off [fixed]
+tx-gre-csum-segmentation: off [fixed]
+tx-ipxip4-segmentation: off [fixed]
+tx-ipxip6-segmentation: off [fixed]
+tx-udp_tnl-segmentation: off [fixed]
+tx-udp_tnl-csum-segmentation: off [fixed]
+tx-tunnel-remcsum-segmentation: off [fixed]
+tx-sctp-segmentation: off [fixed]
+tx-esp-segmentation: off [fixed]
+tx-udp-segmentation: off [fixed]
+tx-vlan-stag-hw-insert: off [fixed]
+rx-vlan-stag-hw-parse: off [fixed]
+rx-vlan-stag-filter: off [fixed]
+
+=== Ring / channels enp0s25 ===
+$ sudo ethtool -g enp0s25
+Ring parameters for enp0s25:
+Pre-set maximums:
+RX:			4096
+RX Mini:		n/a
+RX Jumbo:		n/a
+TX:			4096
+TX push buff len:	n/a
+HDS thresh:		n/a
+Current hardware settings:
+RX:			256
+RX Mini:		n/a
+RX Jumbo:		n/a
+TX:			256
+RX Buf Len:		n/a
+CQE Size:		n/a
+TX Push:		off
+RX Push:		off
+TX push buff len:	n/a
+TCP data split:		n/a
+HDS thresh:		n/a
+$ sudo ethtool -l enp0s25
+netlink error: Operation not supported
+
+=== PCI NIC ===
+00:19.0 Ethernet controller: Intel Corporation 82579LM Gigabit Network Connection (Lewisville) (rev 04)
+02:00.0 Ethernet controller: Intel Corporation 82574L Gigabit Network Connection
+
+=== VLAN interfaces ===
+enp0s25.3154@enp0s25 UP             00:22:4d:a8:54:9b <BROADCAST,MULTICAST,UP,LOWER_UP> 
+enp0s25.3155@enp0s25 UP             00:22:4d:a8:54:9b <BROADCAST,MULTICAST,UP,LOWER_UP> 
+eno2.2184@enp0s25 UP             00:22:4d:a8:54:9b <BROADCAST,MULTICAST,UP,LOWER_UP> 
+
+=== IRQs of enp0s25 and their CPU affinity ===
+IRQ 25 -> CPUs 0-3   (enp0s25)
+irqbalance: inactive
+RPS: rx-0=0 
+
+=== TC qdiscs ===
+$ sudo tc qdisc show
+qdisc noqueue 0: dev lo root refcnt 2 
+qdisc pfifo_fast 0: dev enp0s25 root refcnt 2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc pfifo_fast 0: dev enp2s0 root refcnt 2 bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
+qdisc noqueue 0: dev enp0s25.3154 root refcnt 2 
+qdisc noqueue 0: dev enp0s25.3155 root refcnt 2 
+qdisc noqueue 0: dev eno2.2184 root refcnt 2 
+qdisc noqueue 0: dev docker0 root refcnt 2 
+
+=== Tools ===
+iptables v1.8.11 (nf_tables)
+bpftool v7.7.0
+using libbpf v1.7
+Ubuntu clang version 21.1.8 (6ubuntu1)
+
+=== Sysctl ===
+net.ipv4.ip_forward = 1
+kernel.bpf_stats_enabled = 0
+net.core.bpf_jit_enable = 1
+
+=== Docker ===
+docker: active, running containers: 0

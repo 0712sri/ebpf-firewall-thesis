@@ -1,0 +1,1282 @@
+[sweep] 80 runs: 5 reps x 16 pairs, 100 rules, 140000 pps, 1400000 pkts -> /home/ubuntu/srinika/results/all_20261127_144255/sweep_20261127_144257_n100.csv
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935367+d9063505) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144310,1,a,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,0,0,0,1385148,0,0,,15.73,15.11,-
+RESULT=OK
+SUCCESS
+[1/80] rep 1  a miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998794(c935687+d9063106) usec, 1400000 (64byte,0frags)
+  140016pps 71Mb/sec (71688192bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144323,1,b0,100,best,80,accept,140000,64,1400000,0,9998794,1374273,1374273,0,0,0,0,1374310,71129603,51.76,15.72,14.82,cpu3:1374273
+RESULT=OK
+SUCCESS
+[2/80] rep 1  b0 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c936066+d9062806) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144336,1,b2,100,worst,9900,accept,140000,64,1400000,0,9998873,1386687,1386687,0,0,0,0,1386718,244234164,176.12,16.21,15.17,cpu3:1386687
+RESULT=OK
+SUCCESS
+[3/80] rep 1  b2 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c930124+d9068748) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144349,1,b2,100,best,80,accept,140000,64,1400000,0,9998872,1371739,1371739,0,0,0,0,1371776,89533443,65.27,15.94,15.05,cpu3:1371739
+RESULT=OK
+SUCCESS
+[4/80] rep 1  b2 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c933842+d9065030) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144402,1,b0,100,miss,9999,accept,140000,64,1400000,0,9998873,1381074,1381074,0,0,0,0,1381107,71242175,51.58,16.20,14.65,cpu3:1381074
+RESULT=OK
+SUCCESS
+[5/80] rep 1  b0 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c932926+d9065947) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144415,1,b2,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,1391708,0,0,0,1391746,365252755,262.44,3.43,2.44,cpu3:1391708
+RESULT=OK
+SUCCESS
+[6/80] rep 1  b2 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c928452+d9070420) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144428,1,b0,100,middle,5500,accept,140000,64,1400000,0,9998872,1381306,1381306,0,0,0,0,1381337,71203523,51.55,15.92,15.13,cpu3:1381306
+RESULT=OK
+SUCCESS
+[7/80] rep 1  b0 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c933129+d9065742) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144441,1,b1,100,best,80,accept,140000,64,1400000,0,9998872,1382635,1382635,0,0,0,0,1382669,130366326,94.29,15.84,14.93,cpu3:1382635
+RESULT=OK
+SUCCESS
+[8/80] rep 1  b1 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c934203+d9064668) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144455,1,b2,100,middle,5500,accept,140000,64,1400000,0,9998871,1380237,1380237,0,0,0,0,1380272,167516967,121.37,16.00,15.05,cpu3:1380237
+RESULT=OK
+SUCCESS
+[9/80] rep 1  b2 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935157+d9063716) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144508,1,b1,100,middle,5500,accept,140000,64,1400000,0,9998873,1374588,1374588,0,0,0,0,1374628,200251612,145.68,16.30,14.65,cpu3:1374588
+RESULT=OK
+SUCCESS
+[10/80] rep 1  b1 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c932363+d9066510) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144521,1,b1,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,1394804,0,0,0,1394840,470172963,337.08,3.45,2.51,cpu3:1394804
+RESULT=OK
+SUCCESS
+[11/80] rep 1  b1 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c929940+d9068933) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144535,1,b1,100,worst,9900,accept,140000,64,1400000,0,9998873,1386502,1386502,0,0,0,0,1386538,310898920,224.23,16.13,15.16,cpu3:1386502
+RESULT=OK
+SUCCESS
+[12/80] rep 1  b1 worst  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c930392+d9068479) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144548,1,a,100,middle,5500,accept,140000,64,1400000,0,9998871,1383255,0,0,0,1383255,0,0,0,,15.96,15.36,-
+RESULT=OK
+SUCCESS
+[13/80] rep 1  a middle  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c930305+d9068567) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144600,1,a,100,best,80,accept,140000,64,1400000,0,9998872,1376675,0,0,0,1376675,0,0,0,,15.78,15.13,-
+RESULT=OK
+SUCCESS
+[14/80] rep 1  a best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935266+d9063607) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144614,1,a,100,worst,9900,accept,140000,64,1400000,0,9998873,1380675,0,0,0,1380675,0,0,0,,16.60,15.19,-
+RESULT=OK
+SUCCESS
+[15/80] rep 1  a worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c933757+d9065116) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144627,1,b0,100,worst,9900,accept,140000,64,1400000,0,9998873,1384694,1384694,0,0,0,0,1384729,72869246,52.62,15.84,14.98,cpu3:1384694
+RESULT=OK
+SUCCESS
+[16/80] rep 1  b0 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9999005(c941250+d9057755) usec, 1400000 (64byte,0frags)
+  140013pps 71Mb/sec (71686656bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144640,2,b0,100,best,80,accept,140000,64,1400000,0,9999005,1385486,1385486,0,0,0,0,1385522,72550728,52.36,15.79,14.98,cpu3:1385486
+RESULT=OK
+SUCCESS
+[17/80] rep 2  b0 best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c941245+d9057627) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144652,2,a,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,0,0,0,1391140,0,0,,15.73,15.04,-
+RESULT=OK
+SUCCESS
+[18/80] rep 2  a miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c932313+d9066559) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144706,2,b2,100,best,80,accept,140000,64,1400000,0,9998872,1376741,1376741,0,0,0,0,1376776,93484936,67.90,15.83,14.95,cpu3:1376741
+RESULT=OK
+SUCCESS
+[19/80] rep 2  b2 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c934221+d9064650) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144719,2,b2,100,middle,5500,accept,140000,64,1400000,0,9998872,1386037,1386037,0,0,0,0,1386083,169540338,122.32,16.28,14.71,cpu3:1386037
+RESULT=OK
+SUCCESS
+[20/80] rep 2  b2 middle  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c933389+d9065482) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144732,2,a,100,worst,9900,accept,140000,64,1400000,0,9998871,1380510,0,0,0,1380510,0,0,0,,16.22,15.54,-
+RESULT=OK
+SUCCESS
+[21/80] rep 2  a worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c937639+d9061231) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144745,2,b1,100,worst,9900,accept,140000,64,1400000,0,9998871,1380901,1380901,0,0,0,0,1380932,310889450,225.13,15.89,15.01,cpu3:1380901
+RESULT=OK
+SUCCESS
+[22/80] rep 2  b1 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c932001+d9066871) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144758,2,b0,100,miss,9999,accept,140000,64,1400000,0,9998873,1379995,1379995,0,0,0,0,1380030,71794808,52.02,15.84,15.00,cpu3:1379995
+RESULT=OK
+SUCCESS
+[23/80] rep 2  b0 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c938913+d9059960) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144811,2,b0,100,middle,5500,accept,140000,64,1400000,0,9998873,1377110,1377110,0,0,0,0,1377142,72588212,52.71,16.16,15.26,cpu3:1377110
+RESULT=OK
+SUCCESS
+[24/80] rep 2  b0 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c936586+d9062285) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144824,2,b2,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1398488,0,0,0,1398531,357878919,255.90,3.49,1.93,cpu3:1398488
+RESULT=OK
+SUCCESS
+[25/80] rep 2  b2 miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c930578+d9068294) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144837,2,a,100,middle,5500,accept,140000,64,1400000,0,9998873,1376688,0,0,0,1376688,0,0,0,,16.16,15.55,-
+RESULT=OK
+SUCCESS
+[26/80] rep 2  a middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c935377+d9063494) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144850,2,b0,100,worst,9900,accept,140000,64,1400000,0,9998872,1378687,1378687,0,0,0,0,1378719,71948132,52.18,16.08,15.18,cpu3:1378687
+RESULT=OK
+SUCCESS
+[27/80] rep 2  b0 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c934092+d9064779) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144904,2,b1,100,middle,5500,accept,140000,64,1400000,0,9998872,1371293,1371293,0,0,0,0,1371329,170695104,124.47,16.11,15.18,cpu3:1371293
+RESULT=OK
+SUCCESS
+[28/80] rep 2  b1 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c927089+d9071783) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144917,2,b1,100,best,80,accept,140000,64,1400000,0,9998873,1383143,1383143,0,0,0,0,1383174,128370684,92.81,16.06,15.13,cpu3:1383143
+RESULT=OK
+SUCCESS
+[29/80] rep 2  b1 best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c932658+d9066213) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144930,2,a,100,best,80,accept,140000,64,1400000,0,9998872,1381132,0,0,0,1381132,0,0,0,,16.22,14.83,-
+RESULT=OK
+SUCCESS
+[30/80] rep 2  a best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998794(c931605+d9067189) usec, 1400000 (64byte,0frags)
+  140016pps 71Mb/sec (71688192bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144943,2,b2,100,worst,9900,accept,140000,64,1400000,0,9998794,1370185,1370185,0,0,0,0,1370224,242623169,177.07,15.35,14.56,cpu3:1370185
+RESULT=OK
+SUCCESS
+[31/80] rep 2  b2 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935458+d9063414) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_144956,2,b1,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,1394898,0,0,0,1394932,468412347,335.80,2.95,1.96,cpu3:1394898
+RESULT=OK
+SUCCESS
+[32/80] rep 2  b1 miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c928649+d9070223) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145009,3,a,100,worst,9900,accept,140000,64,1400000,0,9998873,1377220,0,0,0,1377220,0,0,0,,16.63,15.85,-
+RESULT=OK
+SUCCESS
+[33/80] rep 3  a worst  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c937884+d9060988) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145022,3,a,100,best,80,accept,140000,64,1400000,0,9998873,1375933,0,0,0,1375933,0,0,0,,15.73,15.16,-
+RESULT=OK
+SUCCESS
+[34/80] rep 3  a best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c936145+d9062727) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145036,3,b2,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1395069,0,0,0,1395110,361766125,259.31,3.66,2.08,cpu3:1395069
+RESULT=OK
+SUCCESS
+[35/80] rep 3  b2 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c930888+d9067984) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145049,3,b0,100,miss,9999,accept,140000,64,1400000,0,9998872,1379097,1379097,0,0,0,0,1379131,70685325,51.25,16.11,15.14,cpu3:1379097
+RESULT=OK
+SUCCESS
+[36/80] rep 3  b0 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998794(c939744+d9059050) usec, 1400000 (64byte,0frags)
+  140016pps 71Mb/sec (71688192bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145102,3,b0,100,middle,5500,accept,140000,64,1400000,0,9998794,1381846,1381846,0,0,0,0,1381880,72689361,52.60,15.85,15.01,cpu3:1381846
+RESULT=OK
+SUCCESS
+[37/80] rep 3  b0 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c936778+d9062094) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145115,3,b1,100,middle,5500,accept,140000,64,1400000,0,9998872,1384887,1384887,0,0,0,0,1384923,176815810,127.67,16.10,15.18,cpu3:1384887
+RESULT=OK
+SUCCESS
+[38/80] rep 3  b1 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c936794+d9062079) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145128,3,b2,100,middle,5500,accept,140000,64,1400000,0,9998873,1380316,1380316,0,0,0,0,1380352,167892993,121.63,16.09,15.13,cpu3:1380316
+RESULT=OK
+SUCCESS
+[39/80] rep 3  b2 middle  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c936297+d9062575) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145141,3,a,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,0,0,0,1388570,0,0,,16.02,14.73,-
+RESULT=OK
+SUCCESS
+[40/80] rep 3  a miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c933970+d9064902) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145154,3,b0,100,best,80,accept,140000,64,1400000,0,9998872,1381954,1381954,0,0,0,0,1381990,71260923,51.56,15.94,15.10,cpu3:1381954
+RESULT=OK
+SUCCESS
+[41/80] rep 3  b0 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c934137+d9064733) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145207,3,b0,100,worst,9900,accept,140000,64,1400000,0,9998871,1380911,1380911,0,0,0,0,1380942,72390291,52.42,16.36,15.38,cpu3:1380911
+RESULT=OK
+SUCCESS
+[42/80] rep 3  b0 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c936135+d9062737) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145220,3,b1,100,worst,9900,accept,140000,64,1400000,0,9998872,1377619,1377619,0,0,0,0,1377648,305260937,221.58,15.96,15.03,cpu3:1377619
+RESULT=OK
+SUCCESS
+[43/80] rep 3  b1 worst  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935945+d9062928) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145233,3,a,100,middle,5500,accept,140000,64,1400000,0,9998873,1388443,0,0,0,1388443,0,0,0,,16.04,15.47,-
+RESULT=OK
+SUCCESS
+[44/80] rep 3  a middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c935573+d9063297) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145246,3,b2,100,worst,9900,accept,140000,64,1400000,0,9998871,1379491,1379491,0,0,0,0,1379532,246937083,179.00,16.49,14.91,cpu3:1379491
+RESULT=OK
+SUCCESS
+[45/80] rep 3  b2 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c935803+d9063068) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145300,3,b1,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1391108,0,0,0,1391146,473135030,340.10,2.88,1.96,cpu3:1391108
+RESULT=OK
+SUCCESS
+[46/80] rep 3  b1 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c938080+d9060791) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145313,3,b2,100,best,80,accept,140000,64,1400000,0,9998872,1381891,1381891,0,0,0,0,1381925,89512491,64.77,15.87,14.99,cpu3:1381891
+RESULT=OK
+SUCCESS
+[47/80] rep 3  b2 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c931066+d9067806) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145326,3,b1,100,best,80,accept,140000,64,1400000,0,9998872,1389263,1389263,0,0,0,0,1389299,104085448,74.92,16.32,15.26,cpu3:1389263
+RESULT=OK
+SUCCESS
+[48/80] rep 3  b1 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c935403+d9063468) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145339,4,b0,100,middle,5500,accept,140000,64,1400000,0,9998871,1388804,1388804,0,0,0,0,1388842,73108283,52.64,15.67,14.83,cpu3:1388804
+RESULT=OK
+SUCCESS
+[49/80] rep 4  b0 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c934944+d9063929) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145352,4,b2,100,best,80,accept,140000,64,1400000,0,9998873,1382542,1382542,0,0,0,0,1382578,90547349,65.49,16.09,14.63,cpu3:1382542
+RESULT=OK
+SUCCESS
+[50/80] rep 4  b2 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c933325+d9065547) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145405,4,b2,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1396822,0,0,0,1396855,358832622,256.89,3.36,2.33,cpu3:1396822
+RESULT=OK
+SUCCESS
+[51/80] rep 4  b2 miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c927479+d9071394) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145418,4,a,100,worst,9900,accept,140000,64,1400000,0,9998873,1392437,0,0,0,1392437,0,0,0,,16.45,15.84,-
+RESULT=OK
+SUCCESS
+[52/80] rep 4  a worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c933107+d9065763) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145431,4,b1,100,middle,5500,accept,140000,64,1400000,0,9998871,1389913,1389913,0,0,0,0,1389947,203877319,146.68,15.95,15.00,cpu3:1389913
+RESULT=OK
+SUCCESS
+[53/80] rep 4  b1 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c932428+d9066445) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145444,4,b0,100,best,80,accept,140000,64,1400000,0,9998873,1390966,1390966,0,0,0,0,1391006,69639161,50.06,15.99,15.08,cpu3:1390966
+RESULT=OK
+SUCCESS
+[54/80] rep 4  b0 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c936973+d9061899) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145458,4,b1,100,best,80,accept,140000,64,1400000,0,9998873,1386173,1386173,0,0,0,0,1386208,140950267,101.68,16.04,14.45,cpu3:1386173
+RESULT=OK
+SUCCESS
+[55/80] rep 4  b1 best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c930791+d9068081) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145511,4,a,100,best,80,accept,140000,64,1400000,0,9998872,1380890,0,0,0,1380890,0,0,0,,16.16,15.43,-
+RESULT=OK
+SUCCESS
+[56/80] rep 4  a best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c927703+d9071168) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145524,4,a,100,miss,9999,drop,140000,64,1400000,0,9998871,0,0,0,0,0,1395954,0,0,,15.88,15.24,-
+RESULT=OK
+SUCCESS
+[57/80] rep 4  a miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998880(c927992+d9070887) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145537,4,a,100,middle,5500,accept,140000,64,1400000,0,9998880,1385252,0,0,0,1385252,0,0,0,,15.85,15.25,-
+RESULT=OK
+SUCCESS
+[58/80] rep 4  a middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935631+d9063242) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145550,4,b0,100,worst,9900,accept,140000,64,1400000,0,9998873,1390784,1390784,0,0,0,0,1390827,73079825,52.54,16.10,15.21,cpu3:1390784
+RESULT=OK
+SUCCESS
+[59/80] rep 4  b0 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c935793+d9063079) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145603,4,b2,100,worst,9900,accept,140000,64,1400000,0,9998872,1386926,1386926,0,0,0,0,1386962,242587421,174.91,16.15,14.58,cpu3:1386926
+RESULT=OK
+SUCCESS
+[60/80] rep 4  b2 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c940201+d9058670) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145616,4,b0,100,miss,9999,accept,140000,64,1400000,0,9998871,1377483,1377483,0,0,0,0,1377518,73234189,53.16,15.76,14.87,cpu3:1377483
+RESULT=OK
+SUCCESS
+[61/80] rep 4  b0 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998820(c929239+d9069580) usec, 1400000 (64byte,0frags)
+  140016pps 71Mb/sec (71688192bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145629,4,b2,100,middle,5500,accept,140000,64,1400000,0,9998820,1387642,1387642,0,0,0,0,1387680,168968221,121.76,15.76,14.96,cpu3:1387642
+RESULT=OK
+SUCCESS
+[62/80] rep 4  b2 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c936642+d9062229) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145642,4,b1,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1398622,0,0,0,1398658,467508682,334.26,3.55,2.49,cpu3:1398622
+RESULT=OK
+SUCCESS
+[63/80] rep 4  b1 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c933790+d9065080) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145656,4,b1,100,worst,9900,accept,140000,64,1400000,0,9998871,1381702,1381702,0,0,0,0,1381742,308057778,222.95,15.79,14.89,cpu3:1381702
+RESULT=OK
+SUCCESS
+[64/80] rep 4  b1 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998794(c933014+d9065779) usec, 1400000 (64byte,0frags)
+  140016pps 71Mb/sec (71688192bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145709,5,b2,100,worst,9900,accept,140000,64,1400000,0,9998794,1376693,1376693,0,0,0,0,1376734,242280783,175.98,16.37,14.82,cpu3:1376693
+RESULT=OK
+SUCCESS
+[65/80] rep 5  b2 worst  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c936724+d9062147) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145722,5,a,100,best,80,accept,140000,64,1400000,0,9998871,1380098,0,0,0,1380098,0,0,0,,15.87,15.19,-
+RESULT=OK
+SUCCESS
+[66/80] rep 5  a best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c933171+d9065701) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145735,5,b1,100,middle,5500,accept,140000,64,1400000,0,9998872,1377065,1377065,0,0,0,0,1377103,186442462,135.39,15.83,14.97,cpu3:1377065
+RESULT=OK
+SUCCESS
+[67/80] rep 5  b1 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c932402+d9066470) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145748,5,b1,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1397031,0,0,0,1397065,472022102,337.87,3.18,2.31,cpu3:1397031
+RESULT=OK
+SUCCESS
+[68/80] rep 5  b1 miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c935350+d9063523) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145801,5,b0,100,worst,9900,accept,140000,64,1400000,0,9998873,1379088,1379088,0,0,0,0,1379131,77258224,56.02,16.35,15.37,cpu3:1379088
+RESULT=OK
+SUCCESS
+[69/80] rep 5  b0 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c929674+d9069197) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145815,5,b0,100,miss,9999,accept,140000,64,1400000,0,9998872,1384231,1384231,0,0,0,0,1384266,75482784,54.53,16.23,14.74,cpu3:1384231
+RESULT=OK
+SUCCESS
+[70/80] rep 5  b0 miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c934704+d9064168) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145827,5,a,100,worst,9900,accept,140000,64,1400000,0,9998873,1388352,0,0,0,1388352,0,0,0,,16.33,15.74,-
+RESULT=OK
+SUCCESS
+[71/80] rep 5  a worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9900 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c927421+d9071451) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145841,5,b1,100,worst,9900,accept,140000,64,1400000,0,9998873,1381498,1381498,0,0,0,0,1381530,332705764,240.82,16.11,15.10,cpu3:1381498
+RESULT=OK
+SUCCESS
+[72/80] rep 5  b1 worst  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c930027+d9068846) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145854,5,b0,100,best,80,accept,140000,64,1400000,0,9998873,1389353,1389353,0,0,0,0,1389388,71836526,51.70,15.89,15.02,cpu3:1389353
+RESULT=OK
+SUCCESS
+[73/80] rep 5  b0 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c937947+d9060925) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145907,5,b2,100,middle,5500,accept,140000,64,1400000,0,9998872,1383679,1383679,0,0,0,0,1383718,167930113,121.36,16.01,15.17,cpu3:1383679
+RESULT=OK
+SUCCESS
+[74/80] rep 5  b2 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_empty
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c934499+d9064373) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145920,5,b0,100,middle,5500,accept,140000,64,1400000,0,9998872,1382398,1382398,0,0,0,0,1382435,71155747,51.47,16.16,14.51,cpu3:1382398
+RESULT=OK
+SUCCESS
+[75/80] rep 5  b0 middle  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c932000+d9066872) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145933,5,b2,100,best,80,accept,140000,64,1400000,0,9998872,1382692,1382692,0,0,0,0,1382725,93342337,67.51,15.89,15.07,cpu3:1382692
+RESULT=OK
+SUCCESS
+[76/80] rep 5  b2 best  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : stopped
+ingress enp0s25.3155 : firewall_compre
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998872(c930835+d9068037) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145946,5,b2,100,miss,9999,drop,140000,64,1400000,0,9998872,0,0,1397564,0,0,0,1397599,354793135,253.86,2.97,2.07,cpu3:1397564
+RESULT=OK
+SUCCESS
+[77/80] rep 5  b2 miss  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:9999 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998873(c932530+d9066342) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_145959,5,a,100,miss,9999,drop,140000,64,1400000,0,9998873,0,0,0,0,0,1392767,0,0,,16.08,15.37,-
+RESULT=OK
+SUCCESS
+[78/80] rep 5  a miss  ok
+== casual-lamb: config ==
+iptables jump : 0
+b1_loader     : running
+ingress enp0s25.3155 : chain_input
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 1
+rule set      : -
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:80 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c944294+d9054577) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_150012,5,b1,100,best,80,accept,140000,64,1400000,0,9998871,1378183,1378183,0,0,0,0,1378223,138201356,100.28,15.87,14.85,cpu3:1378183
+RESULT=OK
+SUCCESS
+[79/80] rep 5  b1 best  ok
+== casual-lamb: config ==
+iptables jump : 1
+b1_loader     : stopped
+ingress enp0s25.3155 : none
+egress enp0s25.3154 : count_forwarded
+bpf_stats     : 0
+rule set      : 100 rules (A)
+[pktgen] 1400000 pkts, 64B, 140000 pps -> 10.35.4.4:5500 (vlan 3155)
+     pkts-sofar: 1400000  errors: 0
+Result: OK: 9998871(c936042+d9062829) usec, 1400000 (64byte,0frags)
+  140015pps 71Mb/sec (71687680bps) errors: 0
+timestamp,rep,config,rules,position,dst_port,expected,pps,pkt_size,sent,pktgen_errors,pktgen_usec,fwd,accept,drop,tcfail,a_accept,a_drop,run_cnt,run_ns,ns_per_pkt,cpu_busy_pct,cpu_softirq_pct,cpus
+20261127_150025,5,a,100,middle,5500,accept,140000,64,1400000,0,9998871,1390173,0,0,0,1390173,0,0,0,,16.40,15.11,-
+RESULT=OK
+SUCCESS
+[80/80] rep 5  a middle  ok
+[sweep] done: 80/80 ok -> /home/ubuntu/srinika/results/all_20261127_144255/sweep_20261127_144257_n100.csv
